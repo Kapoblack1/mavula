@@ -1,12 +1,11 @@
 // LoginScreen.js
 import React, {useState} from 'react';
-import { View, Text, ImageBackground, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, KeyboardAvoidingView } from 'react-native';
 import InfoContainer from "../Components/Login/InfoContainer";
 import InputContainer from "../Components/Login/InputContainer";
 import InputRegister from '../Components/registar/InputRegistar';
 
 const windowWidth1 = Dimensions.get('window').width - 100;
-
 const windowHeight = Dimensions.get('window').height;
 const windowHeight1 = Dimensions.get('window').height / 2;
 const windowWidth = Dimensions.get('window').width;
@@ -35,7 +34,10 @@ export default function LoginScreen() {
     setWelcomeText('Crie uma conta');
   };
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container}
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    
+    >
       <ScrollView>
       <Image
           source={require("../../assets/hero_Nero1.png")}
@@ -67,7 +69,7 @@ export default function LoginScreen() {
           />
         )}
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
     
   );
 };
