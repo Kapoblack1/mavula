@@ -1,20 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Folder from "../Components/ContentFolder";
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const menuIcon = require('../../assets/menu.png');
 const arrow = require('../../assets/arrowdown.png');
 const filtro = require('../../assets/filtro.png');
 
 export default function HomeScreen({ onClosePress }) {
-  
   return (
     <View style={styles.pag}>
       <View style={styles.container}>
         <Text style={styles.text}>Teu espaço</Text>
-      <TouchableOpacity onPress={onClosePress}>
+        <TouchableOpacity onPress={onClosePress}>
         <Image source={menuIcon} style={styles.image} />
         </TouchableOpacity>
       </View>
@@ -45,53 +43,40 @@ export default function HomeScreen({ onClosePress }) {
         
         <Image source={filtro} style={styles.filtro} />
       </View>
+      <ScrollView style={styles.pag}>
       
-      <View style={styles.folderView}>
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#EEF7FE"/>
+       
 
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#FFFBEC"/>  
-      </View>
-      <View style={styles.folderView}>
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#FEEEEE"/>
+        <View style={styles.folderView}>
+          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#EEF7FE" />
+          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#FFFBEC" />
+        </View>
 
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#F0FFFF"/>  
-      </View>
-      <View style={styles.folderView}>
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#FFFBEC"/>
+        <View style={styles.folderView}>
+          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#FEEEEE" />
+          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#F0FFFF" />
+        </View>
 
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#EEF7FE"/>  
-      </View>
-      <View style={styles.folderView}>
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#F0FFFF"/>
+        <View style={styles.folderView}>
+          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#FFFBEC" />
+          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#EEF7FE" />
+        </View>
 
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#FEEEEE"/>  
-      </View>
+        <View style={styles.folderView}>
+          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#F0FFFF" />
+          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#FEEEEE" />
+        </View>
+      
+    </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   pag: {
-    paddingLeft: 20,
-    paddingRight: 20,
-    backgroundColor: "white",
-    flex: 1
+    marginLeft: 17,
+    marginRight: 10,
+
   },
   recentes: {
     fontSize: 18,
@@ -160,4 +145,3 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
-
