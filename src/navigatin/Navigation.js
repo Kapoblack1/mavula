@@ -11,13 +11,14 @@ import StorageScreen from '../screens/StorageScreen';
 import SlideMenuScreen from '../screens/SlideMenuScreen';
 import DrawerScreen from '../screens/DrawerScreen';
 import VideoSectionScreen from '../screens/VideoSectionScreen';
+import { useNavigation } from '@react-navigation/native';
 
 const Stack = createStackNavigator();
 
 export default function Navigation(){
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login1" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen}/>
         <Stack.Screen name="HomeScreen" component={HomeScreen}/>
         <Stack.Screen name="ProfileScreen" component={ProfileScreen}/>

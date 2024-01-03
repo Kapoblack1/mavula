@@ -2,11 +2,13 @@ import React, { useRef, useState } from 'react';
 import { Animated, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import HeaderMenu from '../Components/Menu/header';
 import { Export } from 'iconsax-react-native';
+import { useNavigation } from '@react-navigation/native';
 
-export default function SlideMenuScreen({onClosePress}) {
+
+export default function SlideMenuScreen({onClosePress, ShowProfile, ShowHome}) {
   const [currentTab, setCurrentTab] = useState("Home");
   const [showMenu, setShowMenu] = useState(false);
-
+  const navigation = useNavigation();
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
   const closeButtonOffset = useRef(new Animated.Value(0)).current;
@@ -17,11 +19,11 @@ export default function SlideMenuScreen({onClosePress}) {
         <View style={styles.slideMenu}></View>
         <HeaderMenu onClosePress={onClosePress}></HeaderMenu>
         <View style={styles.container1}>
-          <TouchableOpacity onPress={() => handleMenuPress("Início")} style={styles.touchableText}>
+          <TouchableOpacity onPress={ShowHome} style={styles.touchableText}>
             <Text style={styles.text}>Início</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleMenuPress("Minha conta")} style={styles.touchableText}>
+          <TouchableOpacity onPress={ ShowProfile } style={styles.touchableText}>
             <Text style={styles.text}>Minha conta</Text>
           </TouchableOpacity>
 
@@ -38,7 +40,7 @@ export default function SlideMenuScreen({onClosePress}) {
           </TouchableOpacity>
 
           <View style={styles.container2}>
-            <TouchableOpacity onPress={() => handleMenuPress("Terminar Sessão")} style={styles.touchableText}>
+            <TouchableOpacity onPress={{}} style={styles.touchableText}>
               <Export style={styles.logout}></Export>
               <Text style={styles.text1}>Terminar Sessão</Text>
             </TouchableOpacity>

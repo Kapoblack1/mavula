@@ -1,6 +1,6 @@
 //ProfileScreen.js
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Folder from "../Components/ContentFolder";
 
 const arrow = require('../../assets/arrowleft.png');
@@ -13,11 +13,13 @@ const settings = require('../../assets/setting5.png');
 const arrangevertical = require('../../assets/arrangevertical.png');
 const word = require('../../assets/Word.png');
 
-export default function ProfileScreen(){
+export default function ProfileScreen({ onClosePress }){
   return (
     <View style={styles.container1}>
       <View style={styles.container}>
-        <Image source={arrow} />
+        <TouchableOpacity onPress={onClosePress}>
+          <Image source={arrow} />
+        </TouchableOpacity >
         <Text style={styles.minhaConta}>Minha Conta</Text>
         <Image source={menu} style={styles.menuStyle} />
       </View>

@@ -4,7 +4,7 @@ import { FingerScan, ArrowRight, Instagram, Facebook } from 'iconsax-react-nativ
 import { Student, Password } from 'phosphor-react-native';
 
 const windowWidth1 = Dimensions.get('window').width - 100;
-export default function InputContainer({ studentNumber, password, setStudentNumber, setPassword, toggleContainerInfo, showInputRegister }){
+export default function InputContainer({ studentNumber, password, setStudentNumber, setPassword, toggleContainerInfo, showInputRegister, Login }){
   return (
     <View style={styles.inputContainer}>
       <View>
@@ -34,7 +34,7 @@ export default function InputContainer({ studentNumber, password, setStudentNumb
             />
           </View>
 
-          <TouchableOpacity onPress={toggleContainerInfo} style={styles.button2}>
+          <TouchableOpacity onPress={Login} style={styles.button2}>
             <Text style={styles.buttonText}>Acede</Text>
             <ArrowRight size="24" color="white" />
           </TouchableOpacity>

@@ -14,6 +14,7 @@
     "@react-native-firebase/auth": "^18.7.3",
     "@react-native-firebase/firestore": "^18.7.3",
     "@react-native-firebase/storage": "^18.7.3",
+    "@react-navigation/native": "^6.1.9",
     "@react-navigation/stack": "^6.3.20",
     "@types/react": "^18.2.45",
     "expo": "~49.0.15",
@@ -36,7 +37,8 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@types/react-native": "^0.73.0"
   },
   "private": true
 }
