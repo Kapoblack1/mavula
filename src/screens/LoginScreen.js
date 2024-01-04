@@ -6,7 +6,7 @@ import InputContainer from "../Components/Login/InputContainer";
 import InputRegister from '../Components/registar/InputRegistar';
 import { useNavigation } from '@react-navigation/native';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
-
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import {GoogleAuthProvider, signInWithPopup} from 'firebase/auth'
 const windowWidth1 = Dimensions.get('window').width - 100;
 const windowHeight = Dimensions.get('window').height;
@@ -41,6 +41,40 @@ export default function LoginScreen() {
   function Login(){
     navigation.navigate('DrawerScreen')
   }
+
+  function handleLoginSuccess(userCredential) {
+    console.log('Usuário autenticado com sucesso:', userCredential.user.uid);
+    navigation.navigate('DrawerScreen');
+  }
+  
+  function handleLoginError(error) {
+    console.error('Erro ao autenticar usuário:', error.message);
+  }
+  
+  function createUserSuccess(userCredential) {
+    console.log('Novo usuário criado com sucesso:', userCredential.user.uid);
+    navigation.navigate('DrawerScreen');
+  }
+  
+  function createUserError(error) {
+    console.error('Erro ao criar usuário:', error.message);
+  }
+  
+  function handleLogin() {
+    signInWithEmailAndPassword(FIREBASE_AUTH, studentNumber, password)
+      .then(handleLoginSuccess)
+      .catch((signInError) => {
+        handleLoginError(signInError);
+      });
+  }
+  
+  function createUser() {
+    alert('oiiiii')
+    createUserWithEmailAndPassword(FIREBASE_AUTH, studentNumber, password)
+      .then(createUserSuccess)
+      .catch(createUserError);
+  }
+  
   return (
     <KeyboardAvoidingView style={styles.container}
     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -77,6 +111,7 @@ export default function LoginScreen() {
             setPassword={setPassword}
             toggleContainerInfo={showInputContainer}
             Login = {Login}
+            createUser={createUser}
           />
         )}
       </ScrollView>
