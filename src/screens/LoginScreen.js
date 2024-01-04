@@ -69,7 +69,6 @@ export default function LoginScreen() {
   }
   
   function createUser() {
-    alert('oiiiii')
     createUserWithEmailAndPassword(FIREBASE_AUTH, studentNumber, password)
       .then(createUserSuccess)
       .catch(createUserError);
@@ -98,7 +97,7 @@ export default function LoginScreen() {
             setStudentNumber={setStudentNumber}
             setPassword={setPassword}
             toggleContainerInfo={showInputRegistar}
-            Login={Login}
+            Login={handleLogin}
             
           />
         )}
