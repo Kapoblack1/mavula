@@ -4,13 +4,17 @@ import { View, Text, ImageBackground, StyleSheet, Dimensions, ScrollView, Toucha
 import InfoContainer from "../Components/Login/InfoContainer";
 import InputContainer from "../Components/Login/InputContainer";
 import InputRegister from '../Components/registar/InputRegistar';
-
+import { useNavigation } from '@react-navigation/native';
+import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import {GoogleAuthProvider, signInWithPopup} from 'firebase/auth'
 const windowWidth1 = Dimensions.get('window').width - 100;
 const windowHeight = Dimensions.get('window').height;
 const windowHeight1 = Dimensions.get('window').height / 2;
 const windowWidth = Dimensions.get('window').width;
 
 export default function LoginScreen() {
+  const navigation = useNavigation();
   const [infoContainerVisible, setInfoContainerVisible] = useState(true);
   const [inputContainerVisible, setInputContainerVisible] = useState(false);
   const [inputRegistarVisible, setInputRegistarVisible] = useState(false);
@@ -33,6 +37,43 @@ export default function LoginScreen() {
     setInputRegistarVisible(true);
     setWelcomeText('Crie uma conta');
   };
+
+  function Login(){
+    navigation.navigate('DrawerScreen')
+  }
+
+  function handleLoginSuccess(userCredential) {
+    console.log('Usuário autenticado com sucesso:', userCredential.user.uid);
+    navigation.navigate('DrawerScreen');
+  }
+  
+  function handleLoginError(error) {
+    console.error('Erro ao autenticar usuário:', error.message);
+  }
+  
+  function createUserSuccess(userCredential) {
+    console.log('Novo usuário criado com sucesso:', userCredential.user.uid);
+    navigation.navigate('DrawerScreen');
+  }
+  
+  function createUserError(error) {
+    console.error('Erro ao criar usuário:', error.message);
+  }
+  
+  function handleLogin() {
+    signInWithEmailAndPassword(FIREBASE_AUTH, studentNumber, password)
+      .then(handleLoginSuccess)
+      .catch((signInError) => {
+        handleLoginError(signInError);
+      });
+  }
+  
+  function createUser() {
+    createUserWithEmailAndPassword(FIREBASE_AUTH, studentNumber, password)
+      .then(createUserSuccess)
+      .catch(createUserError);
+  }
+  
   return (
     <KeyboardAvoidingView style={styles.container}
     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -46,7 +87,7 @@ export default function LoginScreen() {
         <View style={styles.containerInfo}>
           <Text style={styles.BoasVindas}>{welcomeText}</Text>
           <Text style={styles.mavula}>Mavula</Text>
-          {infoContainerVisible && <InfoContainer isVisible={infoContainerVisible} showInputRegistar={showInputRegistar} />}
+          {infoContainerVisible && <InfoContainer isVisible={infoContainerVisible} showInputRegistar={showInputContainer} />}
         </View>
 
         {inputContainerVisible && (
@@ -56,6 +97,8 @@ export default function LoginScreen() {
             setStudentNumber={setStudentNumber}
             setPassword={setPassword}
             toggleContainerInfo={showInputRegistar}
+            Login={handleLogin}
+            
           />
         )}
 
@@ -66,6 +109,8 @@ export default function LoginScreen() {
             setStudentNumber={setStudentNumber}
             setPassword={setPassword}
             toggleContainerInfo={showInputContainer}
+            Login = {Login}
+            createUser={createUser}
           />
         )}
       </ScrollView>

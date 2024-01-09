@@ -1,10 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import { FingerScan, ArrowRight, Instagram, Facebook } from 'iconsax-react-native';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+
 import { Student, Password } from 'phosphor-react-native';
 
 const windowWidth1 = Dimensions.get('window').width - 100;
-export default function ImputRegister({ studentNumber, password, setStudentNumber, setPassword, toggleContainerInfo }){
+export default function ImputRegister({ studentNumber, password, setStudentNumber, setPassword, toggleContainerInfo, createUser }){
     return(
         <View style={styles.inputContainer}>
             <View>
@@ -34,7 +36,7 @@ export default function ImputRegister({ studentNumber, password, setStudentNumbe
             />
           </View>
 
-          <TouchableOpacity onPress={toggleContainerInfo} style={styles.button2}>
+          <TouchableOpacity onPress={createUser} style={styles.button2}>
             <Text style={styles.buttonText}>Pedir acesso</Text>
             <ArrowRight size="24" color="white" />
           </TouchableOpacity>

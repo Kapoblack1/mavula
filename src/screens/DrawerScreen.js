@@ -6,12 +6,17 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import HomeScreen from '../screens/HomeScreen';
 import HeaderMenu from '../Components/Menu/header'; // Importe o componente HeaderMenu
+import ProfileScreen from './ProfileScreen';
+import SettingsScreen from './SettingsScreen';
 
 export default function DrawerScreen({onClosePress}) {
     const [showMenu, setShowMenu] = useState(false);
+    const [ShowProfile, setShowProfile] = useState(false);
+    const [ShowHome, setShowHome] = useState(true);
+    const [ShowSettings, setShowSettings] = useState(false);
     const moveToRigth = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
-
+    let componentToRender;
     function Drawer() {
         Animated.timing(scale, {
             toValue: showMenu ? 1 : 0.6,
@@ -26,9 +31,28 @@ export default function DrawerScreen({onClosePress}) {
         setShowMenu(!showMenu);
     }
 
+    function ShowProfileScreen(){
+        setShowProfile(true)
+        setShowHome(false)
+        setShowSettings(false)
+    }
+    function ShowHomeScreen(){
+        setShowProfile(false)
+        setShowHome(true)
+        setShowSettings(false)
+    }
+
+    if (ShowHome) {
+        componentToRender = <HomeScreen onClosePress={Drawer}></HomeScreen>;
+      } else if(ShowProfile) {
+        componentToRender = <ProfileScreen onClosePress={Drawer}></ProfileScreen>;
+      } else if(ShowSettings){
+        componentToRender = <SettingsScreen></SettingsScreen>;
+      }
+
     return (
         <View style={styles.container}>
-            <SlideMenuScreen onClosePress={Drawer}></SlideMenuScreen>
+            <SlideMenuScreen onClosePress={Drawer} ShowProfile={ShowProfileScreen} ShowHome={ShowHomeScreen} ></SlideMenuScreen>
             <Animated.View style={{
                 flex: 1,
                 backgroundColor: "white",
@@ -40,8 +64,8 @@ export default function DrawerScreen({onClosePress}) {
                 transform: [{ scale: scale }, { translateX: moveToRigth }],
             }}>
                 <View style={styles.container2}>
+                {componentToRender}
                     
-                    <HomeScreen onClosePress={Drawer}></HomeScreen>
                 </View>
             </Animated.View>
         </View>
