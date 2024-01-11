@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Folder from "../Components/ContentFolder";
@@ -8,12 +8,31 @@ const arrow = require('../../assets/arrowdown.png');
 const filtro = require('../../assets/filtro.png');
 
 export default function HomeScreen({ onClosePress }) {
+  const [folders, setFolders] = useState([]);
+  const [colorIndex, setColorIndex] = useState(0);
+  const colors = ['#EEF7FE', '#FFFBEC', '#FEEEEE', '#F0FFFF'];
+
+  const createFolder = () => {
+    const newFolder = {
+      folderName: `FolderName ${folders.length + 1}`,
+      folderDescription: 'Nova Pasta',
+      color: colors[colorIndex],
+    };
+
+    setColorIndex((colorIndex + 1) % colors.length);
+    setFolders((prevFolders) => [...prevFolders, newFolder]);
+  };
+
+  const handleFolderPress = (folder) => {
+    console.log(`Pasta ${folder.folderName} foi pressionada!`);
+  };
+
   return (
-    <View style={styles.pag}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <View style={styles.header}>
         <Text style={styles.text}>Teu espaço</Text>
         <TouchableOpacity onPress={onClosePress}>
-        <Image source={menuIcon} style={styles.image} />
+          <Image source={menuIcon} style={styles.image} />
         </TouchableOpacity>
       </View>
 
@@ -22,14 +41,14 @@ export default function HomeScreen({ onClosePress }) {
           <MaterialCommunityIcons
             name="magnify"
             size={30}
-            color={"black"}
+            color={'black'}
             style={styles.icon}
           />
           <TextInput
             inputMode="search"
-            placeholder='Pesquisa pasta'
+            placeholder="Pesquisa pasta"
             style={styles.input}
-            placeholderTextColor="black" 
+            placeholderTextColor="black"
             fontSize={16}
           />
         </View>
@@ -40,52 +59,46 @@ export default function HomeScreen({ onClosePress }) {
           <Text style={styles.recentes}>Recentes</Text>
           <Image source={arrow} style={styles.imageArrow} />
         </View>
-        
         <Image source={filtro} style={styles.filtro} />
       </View>
-      <ScrollView style={styles.pag}>
-      
-       
 
+      <ScrollView style={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={styles.folderView}>
-          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#EEF7FE" />
-          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#FFFBEC" />
+          {folders.map((folder, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleFolderPress(folder)}>
+              <Folder
+                folderName={folder.folderName}
+                folderDescription={folder.folderDescription}
+                color={folder.color}
+              />
+            </TouchableOpacity>
+          ))}
         </View>
+      </ScrollView>
 
-        <View style={styles.folderView}>
-          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#FEEEEE" />
-          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#F0FFFF" />
-        </View>
-
-        <View style={styles.folderView}>
-          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#FFFBEC" />
-          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#EEF7FE" />
-        </View>
-
-        <View style={styles.folderView}>
-          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#F0FFFF" />
-          <Folder folderName="FolderName" folderDescription="Dezembro 20.2020" color="#FEEEEE" />
-        </View>
-      
-    </ScrollView>
+      <TouchableOpacity onPress={createFolder} style={styles.addButton}>
+        <Text style={styles.addButtonText}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  pag: {
+  container: {
+    flex: 1,
     marginLeft: 17,
     marginRight: 10,
-
   },
-  recentes: {
-    fontSize: 18,
-  },
-  container: {
+  header: {
     marginTop: 80,
     marginBottom: 10,
     justifyContent: 'space-between',
     flexDirection: 'row',
+  },
+  recentes: {
+    fontSize: 18,
   },
   text: {
     color: 'black',
@@ -103,15 +116,10 @@ const styles = StyleSheet.create({
     height: 45,
     resizeMode: 'contain',
   },
-  filtro: {
-
-    
-  },
+  filtro: {},
   div: {
-    
     marginBottom: 30,
     flexDirection: 'row',
-    
   },
   div1: {
     borderColor: 'black',
@@ -120,7 +128,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   div2: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'center',
   },
   inputContainer: {
@@ -139,9 +147,30 @@ const styles = StyleSheet.create({
     width: 300,
     height: 50,
   },
-  folderView:{
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#22215B', // Customize the button style
+    padding: 15,
+    borderRadius: 35,
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  scroll: {
+    flex: 1,
+  },
+  folderView: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 30,
   },
 });
