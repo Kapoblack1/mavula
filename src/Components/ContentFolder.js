@@ -46,17 +46,18 @@ export default ContentFolder;
 
 const styles = StyleSheet.create({
   container: {
-    width: "43%",
-    height: "87%",
+    // width: "50%",
+    // height: "87%",
     marginLeft: "0%",
-    marginRight: "2%",
+    flex: 1,
+    // marginRight: "2%",
+    gap: 5,
     marginBottom: "4%",
     borderRadius: 15,
     paddingRight: 10,
     paddingBottom: 20,
     paddingVertical: 12,
     paddingHorizontal: 15,
-    
   },
   header: {
     flexDirection: "row",
