@@ -10,16 +10,16 @@ import {
   Pressable,
   useWindowDimensions,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Folder from "../Components/ContentFolder";
+import { useNavigation } from "@react-navigation/native";
 import AddButton from "../Components/Add-Button";
 
 const menuIcon = require("../../assets/menu.png");
 const arrow = require("../../assets/arrowdown.png");
 const filtro = require("../../assets/filtro.png");
 
-export default function HomeScreen({ onClosePress }) {
+const HomeScreen = ({ onClosePress }) => {
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
   const navigation = useNavigation();
@@ -61,19 +61,20 @@ export default function HomeScreen({ onClosePress }) {
       <ScrollView style={styles.pag}>
         <View style={styles.folderViewContainer}>
           <Pressable
-            onPress={navigation.navigate("FilesScreen")}
+            onPress={() =>
+              navigation.navigate("FilesScreen", {
+                folderName: "EIN7_T1",
+              })
+            }
             style={styles.folderView}
           >
             <Folder
-              folderName="Ficheiros"
+              folderName="EIN7_T1"
               folderDescription="Dezembro 20.2020"
               color="#EEF7FE"
             />
           </Pressable>
-          <Pressable
-            onPress={navigation.navigate("FilesScreen")}
-            style={styles.folderView}
-          >
+          <Pressable onPress={() => {}} style={styles.folderView}>
             <Folder
               folderName="FolderName"
               folderDescription="Dezembro 20.2020"
@@ -82,20 +83,14 @@ export default function HomeScreen({ onClosePress }) {
           </Pressable>
         </View>
         <View style={styles.folderViewContainer}>
-          <Pressable
-            onPress={navigation.navigate("FilesScreen")}
-            style={styles.folderView}
-          >
+          <Pressable onPress={() => {}} style={styles.folderView}>
             <Folder
               folderName="FolderName"
               folderDescription="Dezembro 20.2020"
               color="#FEEEEE"
             />
           </Pressable>
-          <Pressable
-            onPress={navigation.navigate("FilesScreen")}
-            style={styles.folderView}
-          >
+          <Pressable onPress={() => {}} style={styles.folderView}>
             <Folder
               folderName="FolderName"
               folderDescription="Dezembro 20.2020"
@@ -105,20 +100,14 @@ export default function HomeScreen({ onClosePress }) {
         </View>
 
         <View style={styles.folderViewContainer}>
-          <Pressable
-            onPress={navigation.navigate("FilesScreen")}
-            style={styles.folderView}
-          >
+          <Pressable onPress={() => {}} style={styles.folderView}>
             <Folder
               folderName="FolderName"
               folderDescription="Dezembro 20.2020"
               color="#FFFBEC"
             />
           </Pressable>
-          <Pressable
-            onPress={navigation.navigate("FilesScreen")}
-            style={styles.folderView}
-          >
+          <Pressable onPress={() => {}} style={styles.folderView}>
             <Folder
               folderName="FolderName"
               folderDescription="Dezembro 20.2020"
@@ -128,20 +117,14 @@ export default function HomeScreen({ onClosePress }) {
         </View>
 
         <View style={styles.folderViewContainer}>
-          <Pressable
-            onPress={navigation.navigate("FilesScreen")}
-            style={styles.folderView}
-          >
+          <Pressable onPress={() => {}} style={styles.folderView}>
             <Folder
               folderName="FolderName"
               folderDescription="Dezembro 20.2020"
               color="#F0FFFF"
             />
           </Pressable>
-          <Pressable
-            onPress={navigation.navigate("FilesScreen")}
-            style={styles.folderView}
-          >
+          <Pressable onPress={() => {}} style={styles.folderView}>
             <Folder
               folderName="FolderName"
               folderDescription="Dezembro 20.2020"
@@ -153,7 +136,9 @@ export default function HomeScreen({ onClosePress }) {
       <AddButton />
     </View>
   );
-}
+};
+
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   pag: {

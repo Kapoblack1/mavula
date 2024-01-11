@@ -6,6 +6,7 @@ import {
   TextInput,
   View,
   StyleSheet,
+  Pressable,
 } from "react-native";
 import { FILES } from "../mocks/files";
 import ListFileItem from "../Components/List-File-Item";
@@ -16,15 +17,16 @@ const arrow = require("../../assets/arrowleft.png");
 const menu = require("../../assets/menu1.png");
 const arrangevertical = require("../../assets/arrangevertical.png");
 
-const FilesScreen = () => {
+const FilesScreen = ({ route }) => {
   const navigation = useNavigation();
+  const { folderName } = route.params;
   return (
     <ScrollView style={styles.container1}>
       <View style={styles.container}>
-        <TouchableOpacity onPress={navigation.goBack}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={arrow} />
         </TouchableOpacity>
-        <Text style={styles.minhaConta}>Minha Conta</Text>
+        <Text style={styles.minhaConta}>{folderName}</Text>
         <Image source={menu} style={styles.menuStyle} />
       </View>
       <View style={styles.div}>
@@ -48,6 +50,13 @@ const FilesScreen = () => {
         <Text style={styles.minhaConta}>Carregamentos Recentes</Text>
         <Image source={arrangevertical} style={styles.middlebuttonStyle} />
       </View>
+      <Pressable onPress={() => navigation.navigate("VideoSectionScreen")}>
+        <ListFileItem
+          name="Playlist de Video Aulas"
+          date="Novembro 22 , 2020"
+          size="8GB"
+        />
+      </Pressable>
       {FILES.map((file) => (
         <ListFileItem
           name={file.name}
