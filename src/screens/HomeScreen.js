@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -23,6 +23,21 @@ const HomeScreen = ({ onClosePress }) => {
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
   const navigation = useNavigation();
+  const [folders, setFolders] = useState([]);
+  const [colorIndex, setColorIndex] = useState(0);
+  const colors = ["#EEF7FE", "#FFFBEC", "#FEEEEE", "#F0FFFF"];
+
+  const createFolder = () => {
+    const newFolder = {
+      folderName: `FolderName ${folders.length + 1}`,
+      folderDescription: "Nova Pasta",
+      color: colors[colorIndex],
+    };
+
+    setColorIndex((colorIndex + 1) % colors.length);
+    setFolders((prevFolders) => [...prevFolders, newFolder]);
+  };
+
   return (
     <View style={[{ height: height, width: width }, styles.pag]}>
       <View style={styles.container}>
@@ -144,6 +159,12 @@ const styles = StyleSheet.create({
   pag: {
     paddingHorizontal: 20,
   },
+  header: {
+    marginTop: 80,
+    marginBottom: 10,
+    justifyContent: "space-between",
+    flexDirection: "row",
+  },
   recentes: {
     fontSize: 18,
   },
@@ -169,6 +190,7 @@ const styles = StyleSheet.create({
     height: 45,
     resizeMode: "contain",
   },
+  filtro: {},
   filtro: {},
   div: {
     marginBottom: 30,

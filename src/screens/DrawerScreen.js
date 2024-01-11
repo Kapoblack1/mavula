@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
 
 
     }, container2: {
+        flex: 1,
         flexDirection: "row",
 
     }, button: {

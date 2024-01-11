@@ -136,11 +136,9 @@ const styles = StyleSheet.create({
     },
     foto:{
       borderStyle: 'solid',
-      borderWidth: 1,
     },
     pro:{
       borderStyle: 'solid',
-      borderWidth: 1,
       marginRight: 8,
     },
     descrView:{
