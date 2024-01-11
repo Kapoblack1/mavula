@@ -48,13 +48,17 @@ export default ContentFolder;
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'column', // Garante que os elementos estejam di5spostos verticalmente
-    width: 170,
+    // width: "50%",
+    // height: "87%",
+    marginLeft: "0%",
+    flex: 1,
+    // marginRight: "2%",
+    gap: 5,
     marginBottom: "4%",
     borderRadius: 15,
     paddingBottom: 20,
     paddingVertical: 12,
-    paddingHorizontal: 14
+    paddingHorizontal: 15,
   },
   header: {
     flexDirection: "row",

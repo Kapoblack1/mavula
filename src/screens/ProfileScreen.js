@@ -1,82 +1,100 @@
 //ProfileScreen.js
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import Folder from "../Components/ContentFolder";
+import ListFileItem from "../Components/List-File-Item";
+import { FILES } from "../mocks/files";
 
-const arrow = require('../../assets/arrowleft.png');
-const menu = require('../../assets/menu1.png');
-const foto = require('../../assets/foto.png');
-const pro = require('../../assets/pro.png');
-const add = require('../../assets/add.png');
-const arrowright = require('../../assets/arrowright.png');
-const settings = require('../../assets/setting5.png');
-const arrangevertical = require('../../assets/arrangevertical.png');
-const word = require('../../assets/Word.png');
+const arrow = require("../../assets/arrowleft.png");
+const menu = require("../../assets/menu1.png");
+const foto = require("../../assets/foto.png");
+const pro = require("../../assets/pro.png");
+const add = require("../../assets/add.png");
+const arrowright = require("../../assets/arrowright.png");
+const settings = require("../../assets/setting5.png");
+const arrangevertical = require("../../assets/arrangevertical.png");
 
-export default function ProfileScreen({ onClosePress }){
+export default function ProfileScreen({ onClosePress }) {
   return (
-    <View style={styles.container1}>
+    <ScrollView style={styles.container1}>
       <View style={styles.container}>
         <TouchableOpacity onPress={onClosePress}>
           <Image source={arrow} />
-        </TouchableOpacity >
+        </TouchableOpacity>
         <Text style={styles.minhaConta}>Minha Conta</Text>
         <Image source={menu} style={styles.menuStyle} />
       </View>
 
       <View style={styles.perfil}>
         <View style={styles.fotoDiv}>
-          <Image source={foto} style={styles.foto}/>
-          <Image source={pro} style={styles.pro}/>
+          <Image source={foto} style={styles.foto} />
+          <Image source={pro} style={styles.pro} />
         </View>
         <View style={styles.descrView}>
           <Text style={styles.nome}>Luís Alexandre</Text>
           <Text></Text>
           <Text style={styles.title}>Ui/Ux designer</Text>
           <Text></Text>
-          <Text style={styles.description}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Congue bibendum pellentesque mauris, nibh senectus .</Text>
+          <Text style={styles.description}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Congue
+            bibendum pellentesque mauris, nibh senectus .
+          </Text>
         </View>
       </View>
       <View style={styles.middleButtons}>
-          <Text style={styles.minhaConta}>Minhas pastas</Text>
-          <View style={styles.mbView}>
-            <Image source={add} style={styles.middlebuttonStyle}/>
-            <Image source={settings} style={styles.middlebuttonStyle}/>
-            <Image source={arrowright} />
-          </View>
-      </View>
-      <View style={styles.folderView}>
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#EEF7FE"/>
-
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#FFFBEC"/>  
-      </View>
-      <View style={styles.folderView}>
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#FEEEEE"/>
-
-          <Folder folderName="FolderName"
-            folderDescription="Dezembro 20.2020" 
-            color="#F0FFFF"/>  
-      </View>
-      <View style={styles.middleButtons}>
-          <Text style={styles.minhaConta}>Carregamentos Recentes</Text>
-          <Image source={arrangevertical} style={styles.middlebuttonStyle}/>
-      </View>
-      <View style={styles.middleButtons}>
-        <Image source={word} style={styles.middlebuttonStyle}/>
-        <View>
-          <Text style={styles.minhaConta}>Project.docx</Text>
-          <Text style={styles.data}>Novembro 22, 2020</Text>
+        <Text style={styles.minhaConta}>Minhas pastas</Text>
+        <View style={styles.mbView}>
+          <Image source={add} style={styles.middlebuttonStyle} />
+          <Image source={settings} style={styles.middlebuttonStyle} />
+          <Image source={arrowright} />
         </View>
-          
-        <Text style={styles.data}>300kb</Text>
       </View>
-    </View>
+      <View style={styles.folderView}>
+        <Folder
+          folderName="FolderName"
+          folderDescription="Dezembro 20.2020"
+          color="#EEF7FE"
+        />
+
+        <Folder
+          folderName="FolderName"
+          folderDescription="Dezembro 20.2020"
+          color="#FFFBEC"
+        />
+      </View>
+      <View style={styles.folderView}>
+        <Folder
+          folderName="FolderName"
+          folderDescription="Dezembro 20.2020"
+          color="#FEEEEE"
+        />
+
+        <Folder
+          folderName="FolderName"
+          folderDescription="Dezembro 20.2020"
+          color="#F0FFFF"
+        />
+      </View>
+      <View style={styles.middleButtons}>
+        <Text style={styles.minhaConta}>Carregamentos Recentes</Text>
+        <Image source={arrangevertical} style={styles.middlebuttonStyle} />
+      </View>
+      {FILES.map((file) => (
+        <ListFileItem
+          name={file.name}
+          ext={file.ext}
+          date={file.date}
+          size={file.size}
+        />
+      ))}
+    </ScrollView>
   );
 };
 

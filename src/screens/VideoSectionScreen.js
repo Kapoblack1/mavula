@@ -1,17 +1,28 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  Pressable,
+} from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useNavigation } from "@react-navigation/native";
 
-const arrow = require('../../assets/arrowleft.png');
-const menu = require('../../assets/menu1.png');
-const java1 = require('../../assets/java1.png');
+const arrow = require("../../assets/arrowleft.png");
+const menu = require("../../assets/menu1.png");
+const java1 = require("../../assets/java1.png");
 
-export default function VideoSectionScreen(){
+export default function VideoSectionScreen() {
+  const navigation = useNavigation();
   return (
     <ScrollView style={styles.pag}>
-
       <View style={styles.container}>
-        <Image source={arrow} />
+        <Pressable onPress={() => navigation.goBack()}>
+          <Image source={arrow} />
+        </Pressable>
         <Text style={styles.minhaConta}>Videos</Text>
         <Image source={menu} style={styles.menuStyle} />
       </View>
@@ -26,53 +37,53 @@ export default function VideoSectionScreen(){
           />
           <TextInput
             inputMode="search"
-            placeholder='Pesquisa pasta'
+            placeholder="Pesquisa pasta"
             style={styles.input}
-            placeholderTextColor="black" 
+            placeholderTextColor="black"
             fontSize={16}
           />
         </View>
       </View>
 
       <View style={styles.videoContainer}>
-          <Image source={java1} style={styles.videoStyle} />
-          <View style={styles.videoInfoContainer}>
-            <Text style={styles.minhaConta}>Java Bootcamp</Text>
-            <Text style={styles.minhaConta}>4,5</Text>
-            <Text style={styles.minhaConta}>10MB</Text>
-          </View>
+        <Image source={java1} style={styles.videoStyle} />
+        <View style={styles.videoInfoContainer}>
+          <Text style={styles.minhaConta}>Java Bootcamp</Text>
+          <Text style={styles.minhaConta}>4,5</Text>
+          <Text style={styles.minhaConta}>10MB</Text>
+        </View>
       </View>
       <View style={styles.videoContainer}>
-          <Image source={java1} style={styles.videoStyle} />
-          <View style={styles.videoInfoContainer}>
-            <Text style={styles.minhaConta}>Java Bootcamp</Text>
-            <Text style={styles.minhaConta}>4,5</Text>
-            <Text style={styles.minhaConta}>10MB</Text>
-          </View>
+        <Image source={java1} style={styles.videoStyle} />
+        <View style={styles.videoInfoContainer}>
+          <Text style={styles.minhaConta}>Java Bootcamp</Text>
+          <Text style={styles.minhaConta}>4,5</Text>
+          <Text style={styles.minhaConta}>10MB</Text>
+        </View>
       </View>
       <View style={styles.videoContainer}>
-          <Image source={java1} style={styles.videoStyle} />
-          <View style={styles.videoInfoContainer}>
-            <Text style={styles.minhaConta}>Java Bootcamp</Text>
-            <Text style={styles.minhaConta}>4,5</Text>
-            <Text style={styles.minhaConta}>10MB</Text>
-          </View>
+        <Image source={java1} style={styles.videoStyle} />
+        <View style={styles.videoInfoContainer}>
+          <Text style={styles.minhaConta}>Java Bootcamp</Text>
+          <Text style={styles.minhaConta}>4,5</Text>
+          <Text style={styles.minhaConta}>10MB</Text>
+        </View>
       </View>
       <View style={styles.videoContainer}>
-          <Image source={java1} style={styles.videoStyle} />
-          <View style={styles.videoInfoContainer}>
-            <Text style={styles.minhaConta}>Java Bootcamp</Text>
-            <Text style={styles.minhaConta}>4,5</Text>
-            <Text style={styles.minhaConta}>10MB</Text>
-          </View>
+        <Image source={java1} style={styles.videoStyle} />
+        <View style={styles.videoInfoContainer}>
+          <Text style={styles.minhaConta}>Java Bootcamp</Text>
+          <Text style={styles.minhaConta}>4,5</Text>
+          <Text style={styles.minhaConta}>10MB</Text>
+        </View>
       </View>
       <View style={styles.videoContainer}>
-          <Image source={java1} style={styles.videoStyle} />
-          <View style={styles.videoInfoContainer}>
-            <Text style={styles.minhaConta}>Java Bootcamp</Text>
-            <Text style={styles.minhaConta}>4,5</Text>
-            <Text style={styles.minhaConta}>10MB</Text>
-          </View>
+        <Image source={java1} style={styles.videoStyle} />
+        <View style={styles.videoInfoContainer}>
+          <Text style={styles.minhaConta}>Java Bootcamp</Text>
+          <Text style={styles.minhaConta}>4,5</Text>
+          <Text style={styles.minhaConta}>10MB</Text>
+        </View>
       </View>
     </ScrollView>
   );
