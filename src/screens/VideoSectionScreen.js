@@ -45,14 +45,25 @@ export default function VideoSectionScreen() {
         </View>
       </View>
 
-      <View style={styles.videoContainer}>
-        <Image source={java1} style={styles.videoStyle} />
-        <View style={styles.videoInfoContainer}>
-          <Text style={styles.minhaConta}>Java Bootcamp</Text>
-          <Text style={styles.minhaConta}>4,5</Text>
-          <Text style={styles.minhaConta}>10MB</Text>
+      <Pressable
+        onPress={() =>
+          navigation.navigate("VideoReproductionScreen", {
+            videoName: "Java Bootcamp first",
+            videoDescription: "Curso de Java",
+            videoSize: "10MB",
+            videoTime: "4,5",
+          })
+        }
+      >
+        <View style={styles.videoContainer}>
+          <Image source={java1} style={styles.videoStyle} />
+          <View style={styles.videoInfoContainer}>
+            <Text style={styles.minhaConta}>Java Bootcamp first</Text>
+            <Text style={styles.minhaConta}>4,5</Text>
+            <Text style={styles.minhaConta}>10MB</Text>
+          </View>
         </View>
-      </View>
+      </Pressable>
       <View style={styles.videoContainer}>
         <Image source={java1} style={styles.videoStyle} />
         <View style={styles.videoInfoContainer}>

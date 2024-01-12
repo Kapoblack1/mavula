@@ -12,6 +12,7 @@ import SlideMenuScreen from '../screens/SlideMenuScreen';
 import DrawerScreen from '../screens/DrawerScreen';
 import VideoSectionScreen from '../screens/VideoSectionScreen';
 import FilesScreen from "../screens/FilesScreen";
+import VideoReproductionScreen from "../screens/VideoReproductionScreen";
 
 const Stack = createStackNavigator();
 
@@ -34,6 +35,10 @@ export default function Navigation() {
         <Stack.Screen
           name="VideoSectionScreen"
           component={VideoSectionScreen}
+        />
+        <Stack.Screen
+          name="VideoReproductionScreen"
+          component={VideoReproductionScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
