@@ -1,16 +1,39 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
-import { ArrowLeftSVG, DotsSVG } from "../Components/svg";
+import { useState, useEffect, useFocusEffect, useCallback } from "react";
+import { ArrowDownSVG, ArrowLeftSVG, DotsSVG } from "../Components/svg";
+import { FILES } from "../mocks/files";
 
 const VideoReproductionScreen = ({ route }) => {
   const navigation = useNavigation();
   const [toggleDescription, setToggleDescription] = useState(false);
-  const { videoName, videoDescription, videoSize, videoTime } = route.params;
+  const {
+    videoName,
+    videoDescription,
+    videoThumbnail,
+    videoGenre,
+    views,
+    videoSize,
+    videoTime,
+  } = route.params;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()}>
+        <Pressable
+          onPress={() => {
+            navigation.canGoBack()
+              ? navigation.goBack()
+              : navigation.navigate("VideoSectionScreen");
+          }}
+        >
           <ArrowLeftSVG maxHeight={24} maxWidth={24} width="100%" />
         </Pressable>
         <Text style={styles.headerText}>Video</Text>
@@ -19,18 +42,28 @@ const VideoReproductionScreen = ({ route }) => {
         </Pressable>
       </View>
       <ScrollView style={styles.videoSection}>
-        <View style={styles.video}></View>
+        <View style={styles.video}>
+          <Image
+            source={{ uri: videoThumbnail }}
+            resizeMode="cover"
+            style={{ flex: 1 }}
+          />
+        </View>
         <View style={styles.videoInfo}>
           <Text style={styles.videoInfoText}>
-            {videoDescription} - {videoName}
+            {videoGenre} - {videoName}
           </Text>
-          <Text style={styles.videoInfoText}>1,3M de Visualizações</Text>
+          <Text style={styles.videoInfoText}>{views} de Visualizações</Text>
         </View>
         <View style={styles.videoDescription}>
-          <Pressable onPress={() => setToggleDescription(!toggleDescription)}>
+          <Pressable
+            style={{ flexDirection: "row", gap: 10 }}
+            onPress={() => setToggleDescription(!toggleDescription)}
+          >
             <Text style={[styles.videoInfoText, { marginBottom: 20 }]}>
               Descrição
             </Text>
+            <ArrowDownSVG maxHeight={24} maxWidth={24} width="100%" />
           </Pressable>
           {toggleDescription && (
             <Text style={styles.normalText}>{videoDescription}</Text>
@@ -39,42 +72,39 @@ const VideoReproductionScreen = ({ route }) => {
         <View style={styles.relatedVideos}>
           <Text style={styles.relatedVideosTitle}>Videos Relacionados</Text>
           <View style={styles.relatedVideosContainer}>
-            <View style={styles.relatedVideosVideo}>
-              <View style={styles.relatedVideoThumb}></View>
-              <View style={styles.relatedVideosVideoInfoContainer}>
-                <Text style={styles.relatedVideosVideoInfoText}>
-                  {videoName}
-                </Text>
-                <Text style={styles.normalText}>{videoName}</Text>
-              </View>
-            </View>
-            <View style={styles.relatedVideosVideo}>
-              <View style={styles.relatedVideoThumb}></View>
-              <View style={styles.relatedVideosVideoInfoContainer}>
-                <Text style={styles.relatedVideosVideoInfoText}>
-                  {videoName}
-                </Text>
-                <Text style={styles.normalText}>{videoName}</Text>
-              </View>
-            </View>
-            <View style={styles.relatedVideosVideo}>
-              <View style={styles.relatedVideoThumb}></View>
-              <View style={styles.relatedVideosVideoInfoContainer}>
-                <Text style={styles.relatedVideosVideoInfoText}>
-                  {videoName}
-                </Text>
-                <Text style={styles.normalText}>{videoName}</Text>
-              </View>
-            </View>
-            <View style={styles.relatedVideosVideo}>
-              <View style={styles.relatedVideoThumb}></View>
-              <View style={styles.relatedVideosVideoInfoContainer}>
-                <Text style={styles.relatedVideosVideoInfoText}>
-                  {videoName}
-                </Text>
-                <Text style={styles.normalText}>{videoName}</Text>
-              </View>
-            </View>
+            {FILES.filter(
+              (file) => file.genre === videoGenre && file.name != videoName
+            ).map((file) => (
+              <Pressable
+                onPress={() =>
+                  navigation.navigate("VideoReproductionScreen", {
+                    views: file.views,
+                    videoName: file.name,
+                    videoSize: file.size,
+                    videoTime: file.time,
+                    videoGenre: file.genre,
+                    videoThumbnail: file.thumbnail,
+                    videoDescription: file.description,
+                  })
+                }
+              >
+                <View style={styles.relatedVideosVideo}>
+                  <View style={styles.relatedVideoThumb}>
+                    <Image
+                      source={{ uri: file.thumbnail }}
+                      resizeMode="cover"
+                      style={{ flex: 1 }}
+                    />
+                  </View>
+                  <View style={styles.relatedVideosVideoInfoContainer}>
+                    <Text style={styles.relatedVideosVideoInfoText}>
+                      {file.name}
+                    </Text>
+                    <Text style={styles.normalText}>{file.description}</Text>
+                  </View>
+                </View>
+              </Pressable>
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -110,6 +140,8 @@ const styles = StyleSheet.create({
   video: {
     height: 230,
     width: "100%",
+    borderRadius: 5,
+    overflow: "hidden",
     backgroundColor: "#000",
   },
   videoInfo: {
@@ -149,8 +181,10 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   relatedVideoThumb: {
-    width: "100%",
     height: 140,
+    width: "100%",
+    borderRadius: 8,
+    overflow: "hidden",
     backgroundColor: "#000",
   },
   relatedVideosVideoInfoContainer: {
