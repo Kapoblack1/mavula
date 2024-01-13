@@ -8,25 +8,29 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import OutsidePressHandler from "react-native-outside-press";
-import { PlusSVG, TimesSVG, UploadSVG } from "../svg";
+import { CancelSVG, PlusSVG, TimesSVG, UploadSVG } from "../svg";
 import { useState } from "react";
 
-const AddButton = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+const AddButton = ({ onPress, isPressed }) => {
+  // const [modalVisible, setModalVisible] = useState(false);
 
-  const handleOpenUploadModal = () => !modalVisible && setModalVisible(true);
-  const handleCloseUploadModal = () => modalVisible && setModalVisible(false);
+  // const handleOpenUploadModal = () => !modalVisible && setModalVisible(true);
+  // const handleCloseUploadModal = () => modalVisible && setModalVisible(false);
 
-  const width = useWindowDimensions().width;
+  // const width = useWindowDimensions().width;
 
   return (
     <>
       <View style={styles.plusIcon}>
-        <Pressable onPress={handleOpenUploadModal}>
-          <PlusSVG maxWidth={70} maxHeight={70} width="100%" />
+        <Pressable onPress={onPress}>
+          {isPressed ? (
+            <CancelSVG maxWidth={70} maxHeight={70} width="100%" />
+          ) : (
+            <PlusSVG maxWidth={70} maxHeight={70} width="100%" />
+          )}
         </Pressable>
       </View>
-      {modalVisible && (
+      {/* {modalVisible && (
         <OutsidePressHandler
           onOutsidePress={handleCloseUploadModal}
           style={[{ width: width }, styles.modalContainer]}
@@ -45,7 +49,7 @@ const AddButton = () => {
             </Text>
           </View>
         </OutsidePressHandler>
-      )}
+      )} */}
     </>
   );
 };

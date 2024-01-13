@@ -1,27 +1,35 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TextInput } from "react-native";
 
-const ContentFolder = ({ folderName, folderDescription, color }) => {
+const ContentFolder = ({
+  folderName,
+  folderDescription,
+  color,
+  isForCreation,
+  value,
+  placeholder,
+  onChangeText,
+}) => {
   let folder, dot, cor;
 
-  if (color === '#EEF7FE') {
-    folder = require('../../assets/folderBlue.png');
-    dot = require('../../assets/dotBlue.png');
-    cor = '#567DF4';
+  if (color === "#EEF7FE") {
+    folder = require("../../assets/folderBlue.png");
+    dot = require("../../assets/dotBlue.png");
+    cor = "#567DF4";
   } else {
-    if (color === '#FFFBEC') {
-      folder = require('../../assets/folderYellow.png');
-      dot = require('../../assets/dotYellow.png');
-      cor = '#F3C939';
+    if (color === "#FFFBEC") {
+      folder = require("../../assets/folderYellow.png");
+      dot = require("../../assets/dotYellow.png");
+      cor = "#F3C939";
     } else {
-      if (color === '#FEEEEE') {
-        folder = require('../../assets/folderRed.png');
-        dot = require('../../assets/dotRed.png');
-        cor = '#F45656';
+      if (color === "#FEEEEE") {
+        folder = require("../../assets/folderRed.png");
+        dot = require("../../assets/dotRed.png");
+        cor = "#F45656";
       } else {
-        folder = require('../../assets/folderCian.png');
-        dot = require('../../assets/dotCian.png');
-        cor = '#34DEDE';
+        folder = require("../../assets/folderCian.png");
+        dot = require("../../assets/dotCian.png");
+        cor = "#34DEDE";
       }
     }
   }
@@ -30,14 +38,21 @@ const ContentFolder = ({ folderName, folderDescription, color }) => {
     <View style={[styles.container, { backgroundColor: color }]}>
       <View style={styles.header}>
         <Image source={folder} style={styles.folderImage} />
-        <Image source={dot} />
+        {!isForCreation && <Image source={dot} />}
       </View>
       <View style={styles.textContainer}>
-        <Text style={[styles.title, { color: cor }]}>
-          {folderName}
-        </Text>
+        {isForCreation ? (
+          <TextInput
+            value={value}
+            placeholder={placeholder}
+            onChangeText={onChangeText}
+            style={[styles.title, { color: cor }]}
+          />
+        ) : (
+          <Text style={[styles.title, { color: cor }]}>{folderName}</Text>
+        )}
         <Text style={[styles.description, { color: cor }]}>
-          {folderDescription}
+          {isForCreation ? "Agora" : folderDescription}
         </Text>
       </View>
     </View>

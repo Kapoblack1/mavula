@@ -57,8 +57,9 @@ const FilesScreen = ({ route }) => {
           size="8GB"
         />
       </Pressable>
-      {FILES.map((file) => (
+      {FILES.map((file, index) => (
         <ListFileItem
+          key={index}
           name={file.name}
           ext={file.ext}
           date={file.date}
