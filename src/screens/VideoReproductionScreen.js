@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState, useEffect, useFocusEffect, useCallback } from "react";
+import { useState } from "react";
 import { ArrowDownSVG, ArrowLeftSVG, DotsSVG } from "../Components/svg";
 import { FILES } from "../mocks/files";
 
@@ -74,8 +74,9 @@ const VideoReproductionScreen = ({ route }) => {
           <View style={styles.relatedVideosContainer}>
             {FILES.filter(
               (file) => file.genre === videoGenre && file.name != videoName
-            ).map((file) => (
+            ).map((file, index) => (
               <Pressable
+                key={index}
                 onPress={() =>
                   navigation.navigate("VideoReproductionScreen", {
                     views: file.views,
@@ -200,3 +201,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+

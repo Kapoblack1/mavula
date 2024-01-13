@@ -14,6 +14,8 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Folder from "../Components/ContentFolder";
 import { useNavigation } from "@react-navigation/native";
 import AddButton from "../Components/Add-Button";
+import OutsidePressHandler from "react-native-outside-press";
+import { FOLDERS } from "../mocks/folders";
 
 const menuIcon = require("../../assets/menu.png");
 const arrow = require("../../assets/arrowdown.png");
@@ -23,23 +25,41 @@ const HomeScreen = ({ onClosePress }) => {
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
   const navigation = useNavigation();
-  const [folders, setFolders] = useState([]);
   const [colorIndex, setColorIndex] = useState(0);
   const colors = ["#EEF7FE", "#FFFBEC", "#FEEEEE", "#F0FFFF"];
 
-  const createFolder = () => {
-    const newFolder = {
-      folderName: `FolderName ${folders.length + 1}`,
-      folderDescription: "Nova Pasta",
-      color: colors[colorIndex],
-    };
+  const [folders, setFolders] = useState(FOLDERS);
+  const [newFolder, setNewFolder] = useState("");
+  const [creationFolder, setCreationFolder] = useState(false);
 
-    setColorIndex((colorIndex + 1) % colors.length);
-    setFolders((prevFolders) => [...prevFolders, newFolder]);
+  const addFolder = () => {
+    if (newFolder.trim() !== "") {
+      setFolders([
+        {
+          id: Date.now(),
+          name: newFolder,
+          color: "#EEF7FE",
+          completed: false,
+          description: "Agora mesmo",
+        },
+        ...folders,
+      ]);
+      setNewFolder("");
+    }
+    setCreationFolder(false);
+  };
+
+  const deleteFolder = (id) => {
+    setFolders((prevfolders) =>
+      prevfolders.filter((folder) => folder.id !== id)
+    );
   };
 
   return (
-    <View style={[{ height: height, width: width }, styles.pag]}>
+    <Pressable
+      onPress={addFolder}
+      style={[{ height: height, width: width }, styles.pag]}
+    >
       <View style={styles.container}>
         <Text style={styles.text}>Teu espaço</Text>
         <TouchableOpacity onPress={onClosePress}>
@@ -75,81 +95,40 @@ const HomeScreen = ({ onClosePress }) => {
       </View>
       <ScrollView style={styles.pag}>
         <View style={styles.folderViewContainer}>
-          <Pressable
-            onPress={() =>
-              navigation.navigate("FilesScreen", {
-                folderName: "EIN7_T1",
-              })
-            }
-            style={styles.folderView}
-          >
-            <Folder
-              folderName="EIN7_T1"
-              folderDescription="Dezembro 20.2020"
-              color="#EEF7FE"
-            />
-          </Pressable>
-          <Pressable onPress={() => {}} style={styles.folderView}>
-            <Folder
-              folderName="FolderName"
-              folderDescription="Dezembro 20.2020"
-              color="#FFFBEC"
-            />
-          </Pressable>
-        </View>
-        <View style={styles.folderViewContainer}>
-          <Pressable onPress={() => {}} style={styles.folderView}>
-            <Folder
-              folderName="FolderName"
-              folderDescription="Dezembro 20.2020"
-              color="#FEEEEE"
-            />
-          </Pressable>
-          <Pressable onPress={() => {}} style={styles.folderView}>
-            <Folder
-              folderName="FolderName"
-              folderDescription="Dezembro 20.2020"
-              color="#F0FFFF"
-            />
-          </Pressable>
-        </View>
-
-        <View style={styles.folderViewContainer}>
-          <Pressable onPress={() => {}} style={styles.folderView}>
-            <Folder
-              folderName="FolderName"
-              folderDescription="Dezembro 20.2020"
-              color="#FFFBEC"
-            />
-          </Pressable>
-          <Pressable onPress={() => {}} style={styles.folderView}>
-            <Folder
-              folderName="FolderName"
-              folderDescription="Dezembro 20.2020"
-              color="#EEF7FE"
-            />
-          </Pressable>
-        </View>
-
-        <View style={styles.folderViewContainer}>
-          <Pressable onPress={() => {}} style={styles.folderView}>
-            <Folder
-              folderName="FolderName"
-              folderDescription="Dezembro 20.2020"
-              color="#F0FFFF"
-            />
-          </Pressable>
-          <Pressable onPress={() => {}} style={styles.folderView}>
-            <Folder
-              folderName="FolderName"
-              folderDescription="Dezembro 20.2020"
-              color="#FEEEEE"
-            />
-          </Pressable>
+          {creationFolder && (
+            <Pressable onPress={() => {}} style={styles.folderView}>
+              <Folder
+                isForCreation
+                color="#EEF7FE"
+                value={newFolder}
+                placeholder="Criar nova pasta"
+                onChangeText={(text) => setNewFolder(text)}
+              />
+            </Pressable>
+          )}
+          {folders.map((folder) => (
+            <Pressable
+              onPress={() =>
+                navigation.navigate("FilesScreen", {
+                  folderName: folder.name,
+                })
+              }
+              style={styles.folderView}
+            >
+              <Folder
+                folderName={folder.name}
+                folderDescription={folder.description}
+                color={folder.color}
+              />
+            </Pressable>
+          ))}
         </View>
       </ScrollView>
-      <AddButton />
-    </View>
+      <AddButton
+        onPress={() => setCreationFolder(!creationFolder)}
+        isPressed={creationFolder}
+      />
+    </Pressable>
   );
 };
 
@@ -224,12 +203,13 @@ const styles = StyleSheet.create({
   },
   folderViewContainer: {
     flex: 1,
-    gap: 20,
+    gap: 5,
+    flexWrap: "wrap",
     flexDirection: "row",
     justifyContent: "space-between",
   },
   folderView: {
-    flex: 1,
+    width: "47%",
     flexDirection: "row",
   },
 });
