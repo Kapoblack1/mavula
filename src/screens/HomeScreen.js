@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
   },
   folderView: {
     flex: 1,
-    flexDirection: "row",
-  },
-});
+    flexDirection: "row"
+  }})
+
+  
