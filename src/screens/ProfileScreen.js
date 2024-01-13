@@ -86,8 +86,9 @@ export default function ProfileScreen({ onClosePress }) {
         <Text style={styles.minhaConta}>Carregamentos Recentes</Text>
         <Image source={arrangevertical} style={styles.middlebuttonStyle} />
       </View>
-      {FILES.map((file) => (
+      {FILES.map((file, index) => (
         <ListFileItem
+          key={index}
           name={file.name}
           ext={file.ext}
           date={file.date}

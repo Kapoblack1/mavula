@@ -6,7 +6,7 @@ const ListFileItem = ({ name, ext, date, size }) => {
   const docx = require("../../../assets/Word.png");
   const pdf = require("../../../assets/pdf.png");
   const excel = require("../../../assets/excel.png");
-  const video = require("../../../assets/video.png");
+  const video = require("../../../assets/mp4.png");
 
   const getExtension = (ext) => {
     if (ext === "docx") {
@@ -16,6 +16,8 @@ const ListFileItem = ({ name, ext, date, size }) => {
     } else if (ext === "xlsx" || ext === "xls" || ext === "csv") {
       return excel;
     } else if (name === "Playlist de Video Aulas" && !ext) {
+      return video;
+    } else if (ext === "mp4") {
       return video;
     }
   };
