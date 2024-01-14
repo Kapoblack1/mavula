@@ -1,68 +1,63 @@
 import { Image, Text, View, StyleSheet } from "react-native";
-
-// const excel = require("../../../assets/Excel.png");
+import { ExcelSVG, PdfSVG, VideoSVG, WordSVG } from "../svg";
+import { formatFileSize } from "../../utils";
 
 const ListFileItem = ({ name, ext, date, size }) => {
-  const docx = require("../../../assets/Word.png");
-  const pdf = require("../../../assets/pdf.png");
-  const excel = require("../../../assets/excel.png");
-  const video = require("../../../assets/mp4.png");
-
   const getExtension = (ext) => {
     if (ext === "docx") {
-      return docx;
+      return <WordSVG maxWidth={30} maxHeight={30} width="100%" />;
     } else if (ext === "pdf") {
-      return pdf;
+      return <PdfSVG maxWidth={30} maxHeight={30} width="100%" />;
     } else if (ext === "xlsx" || ext === "xls" || ext === "csv") {
-      return excel;
+      return <ExcelSVG maxWidth={30} maxHeight={30} width="100%" />;
     } else if (name === "Playlist de Video Aulas" && !ext) {
-      return video;
+      return <VideoSVG maxWidth={30} maxHeight={30} width="100%" />;
     } else if (ext === "mp4") {
-      return video;
+      return <VideoSVG maxWidth={30} maxHeight={30} width="100%" />;
     }
   };
 
   return (
-    <View style={styles.middleButtons}>
-      <Image
-        source={getExtension(ext)}
-        resizeMode="stretch"
-        style={styles.image}
-      />
+    <View style={styles.container}>
+      <View style={styles.itemIcon}>{getExtension(ext)}</View>
       <View>
-        <Text style={styles.minhaConta}>
-          {name}.{ext}
-        </Text>
+        <Text style={styles.fileName}>{name}</Text>
         <Text style={styles.data}>{date}</Text>
       </View>
 
-      <Text style={styles.size}>{size}</Text>
+      <Text style={styles.size}>{formatFileSize(size)}</Text>
     </View>
   );
 };
 export default ListFileItem;
 
 const styles = StyleSheet.create({
-  minhaConta: {
-    fontWeight: "bold",
-  },
-  middleButtons: {
+  container: {
     marginTop: 14,
     marginLeft: 30,
     marginRight: 30,
     flexDirection: "row",
     alignItems: "center",
   },
-  image: {
+  fileName: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  itemIcon: {
+    width: 50,
+    height: 50,
     marginRight: 20,
-    height: 35,
-    width: 31,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EEF7FE",
   },
   data: {
-    fontSize: 9,
+    fontSize: 12,
+    marginTop: 5,
   },
   size: {
-    fontSize: 9,
+    fontSize: 12,
     marginLeft: "auto",
   },
 });
