@@ -7,12 +7,15 @@ import {
   View,
   StyleSheet,
   Pressable,
+  Linking,
+  RefreshControl,
 } from "react-native";
-import { FILES } from "../mocks/files";
 import ListFileItem from "../Components/List-File-Item";
 import { useNavigation } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useGetFiles } from "../hooks/useGetFiles";
+import { useGetFiles, useRefresh } from "../hooks";
+import Skeleton from "../Components/Skeleton";
+import { getDownloadURL } from "@firebase/storage";
 
 const arrow = require("../../assets/arrowleft.png");
 const menu = require("../../assets/menu1.png");
@@ -21,10 +24,21 @@ const arrangevertical = require("../../assets/arrangevertical.png");
 const FilesScreen = ({ route }) => {
   const navigation = useNavigation();
   const { folderName } = route.params;
-  const files = useGetFiles("all");
-  console.log(files);
+  const { files, loading, refetch } = useGetFiles();
+
+  const openUrl = (url) => {
+    Linking.openURL(url);
+  };
+
+  const { refreshing, onRefresh } = useRefresh(refetch);
+
   return (
-    <ScrollView style={styles.container1}>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      style={styles.container1}
+    >
       <View style={styles.container}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={arrow} />
@@ -53,22 +67,30 @@ const FilesScreen = ({ route }) => {
         <Text style={styles.minhaConta}>Carregamentos Recentes</Text>
         <Image source={arrangevertical} style={styles.middlebuttonStyle} />
       </View>
-      <Pressable onPress={() => navigation.navigate("VideoSectionScreen")}>
-        <ListFileItem
-          name="Playlist de Video Aulas"
-          date="Novembro 22 , 2020"
-          size="8GB"
-        />
-      </Pressable>
-      {FILES.map((file, index) => (
-        <ListFileItem
-          key={index}
-          name={file.name}
-          ext={file.ext}
-          date={file.date}
-          size={file.size}
-        />
-      ))}
+      {loading ? (
+        <Skeleton numberOfRows={5} />
+      ) : (
+        <>
+          <Pressable onPress={() => navigation.navigate("VideoSectionScreen")}>
+            <ListFileItem
+              name="Playlist de Video Aulas"
+              date="Novembro 22 , 2020"
+              size="8GB"
+            />
+          </Pressable>
+          {files.map((file, index) => (
+            <Pressable key={index} onPress={() => openUrl(file.downloadURL)}>
+              <ListFileItem
+                key={index}
+                name={file.name}
+                ext={file.ext}
+                date={file.date}
+                size={file.size}
+              />
+            </Pressable>
+          ))}
+        </>
+      )}
     </ScrollView>
   );
 };
@@ -77,13 +99,13 @@ export default FilesScreen;
 const styles = StyleSheet.create({
   container: {
     marginTop: 40,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 30,
     marginLeft: 28,
     marginRight: 25,
+    marginBottom: 30,
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "white",
+    justifyContent: "space-between",
   },
   container1: {
     backgroundColor: "white",
