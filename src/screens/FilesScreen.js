@@ -12,6 +12,7 @@ import { FILES } from "../mocks/files";
 import ListFileItem from "../Components/List-File-Item";
 import { useNavigation } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useGetFiles } from "../hooks/useGetFiles";
 
 const arrow = require("../../assets/arrowleft.png");
 const menu = require("../../assets/menu1.png");
@@ -20,6 +21,8 @@ const arrangevertical = require("../../assets/arrangevertical.png");
 const FilesScreen = ({ route }) => {
   const navigation = useNavigation();
   const { folderName } = route.params;
+  const files = useGetFiles("all");
+  console.log(files);
   return (
     <ScrollView style={styles.container1}>
       <View style={styles.container}>

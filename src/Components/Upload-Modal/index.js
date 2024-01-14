@@ -38,13 +38,13 @@ const UploadModal = ({ onPress, isPressed, handleClose }) => {
 
       switch (fileType) {
         case "excel":
-          storageRef = ref(FIREBASE_STORAGE, `excels/${encodedName}`);
+          storageRef = ref(FIREBASE_STORAGE, `files/${encodedName}`);
           break;
         case "pdf":
-          storageRef = ref(FIREBASE_STORAGE, `pdfs/${encodedName}`);
+          storageRef = ref(FIREBASE_STORAGE, `files/${encodedName}`);
           break;
         case "word":
-          storageRef = ref(FIREBASE_STORAGE, `word/${encodedName}`);
+          storageRef = ref(FIREBASE_STORAGE, `files/${encodedName}`);
           break;
         default:
           // Handle other file types if needed
