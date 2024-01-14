@@ -21,7 +21,9 @@ const ListFileItem = ({ name, ext, date, size }) => {
     <View style={styles.container}>
       <View style={styles.itemIcon}>{getExtension(ext)}</View>
       <View>
-        <Text style={styles.fileName}>{name}</Text>
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.fileName}>
+          {name}
+        </Text>
         <Text style={styles.data}>{date}</Text>
       </View>
 
@@ -40,6 +42,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   fileName: {
+    width: 200,
     fontSize: 16,
     fontWeight: "bold",
   },
