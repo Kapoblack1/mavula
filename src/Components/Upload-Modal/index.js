@@ -33,18 +33,17 @@ const UploadModal = ({ onPress, isPressed, handleClose }) => {
 
   const uploadFile = async (document, fileType) => {
     try {
-      const encodedName = encodeURIComponent(document.name);
       let storageRef;
 
       switch (fileType) {
         case "excel":
-          storageRef = ref(FIREBASE_STORAGE, `files/${encodedName}`);
+          storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
           break;
         case "pdf":
-          storageRef = ref(FIREBASE_STORAGE, `files/${encodedName}`);
+          storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
           break;
         case "word":
-          storageRef = ref(FIREBASE_STORAGE, `files/${encodedName}`);
+          storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
           break;
         default:
           // Handle other file types if needed
