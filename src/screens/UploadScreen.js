@@ -1,6 +1,7 @@
 import { View, Text, Button, Alert } from 'react-native';
 import React, { useState } from 'react';
 import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker'; // Adicionado para seleção de vídeos
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FIREBASE_STORAGE } from '../../FirebaseConfig';
 
@@ -8,6 +9,7 @@ const UploadScreen = () => {
   const [selectedExcelDocuments, setSelectedExcelDocuments] = useState([]);
   const [selectedPdfDocuments, setSelectedPdfDocuments] = useState([]);
   const [selectedWordDocuments, setSelectedWordDocuments] = useState([]);
+  const [selectedVideos, setSelectedVideos] = useState([]); // Novo estado para armazenar vídeos
 
   const uploadFile = async (document, fileType) => {
     try {
@@ -23,6 +25,9 @@ const UploadScreen = () => {
           break;
         case 'word':
           storageRef = ref(FIREBASE_STORAGE, `word/${encodedName}`);
+          break;
+        case 'video':
+          storageRef = ref(FIREBASE_STORAGE, `videos/${encodedName}`);
           break;
         default:
           // Handle other file types if needed
@@ -45,22 +50,42 @@ const UploadScreen = () => {
 
   const selectDoc = async (fileType, setDocuments) => {
     try {
-      const docs = await DocumentPicker.getDocumentAsync({
-        type: fileType,
-        multiple: true,
-      });
-
-      console.log(`Selected ${fileType} Documents:`, docs);
-
-      if (!docs.canceled) {
-        setDocuments(docs.assets);
+      let docs;
+  
+      if (fileType === 'video') {
+        // Use Expo ImagePicker for video selection
+        docs = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+          allowsEditing: true,
+          aspect: [16, 9],
+          quality: 1,
+        });
+  
+        if (!docs.cancelled) {
+          setDocuments([docs]);
+        } else {
+          console.log('User cancelled the video upload');
+        }
       } else {
-        console.log(`User cancelled the ${fileType} upload`);
+        // Use Expo DocumentPicker for other file types
+        docs = await DocumentPicker.getDocumentAsync({
+          type: fileType,
+          multiple: true,
+        });
+  
+        console.log(`Selected ${fileType} Documents:`, docs);
+  
+        if (!docs.canceled) {
+          setDocuments(docs.assets || []); // Use "assets" array instead of "uri"
+        } else {
+          console.log(`User cancelled the ${fileType} upload`);
+        }
       }
     } catch (err) {
       console.error(`Error picking ${fileType} documents:`, err);
     }
   };
+  
 
   const handleUpload = (fileType, selectedDocuments) => {
     if (selectedDocuments.length > 0) {
@@ -99,6 +124,13 @@ const UploadScreen = () => {
           <Text key={index}>{document.name}</Text>
         ))}
         <Button title="Upload Word Files" onPress={() => handleUpload('word', selectedWordDocuments)} />
+
+        {/* Adicionado para seleção de vídeos */}
+        <Button title="Select Video" onPress={() => selectDoc('video', setSelectedVideos)} />
+        {selectedVideos.map((document, index) => (
+          <Text key={index}>{document.uri}</Text>
+        ))}
+        <Button title="Upload Videos" onPress={() => handleUpload('video', selectedVideos)} />
       </View>
     </View>
   );
