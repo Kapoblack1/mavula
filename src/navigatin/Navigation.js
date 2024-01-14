@@ -22,7 +22,7 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="UploadPDFScreen"
+        initialRouteName="HomeScreen"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
@@ -35,7 +35,10 @@ export default function Navigation() {
         <Stack.Screen name="SlideMenuScreen" component={SlideMenuScreen} />
         <Stack.Screen name="DrawerScreen" component={DrawerScreen} />
         <Stack.Screen name="UploadPDFScreen" component={UploadPDFScreen} />
-        <Stack.Screen name="DocumentViewerScreen" component={DocumentViewerScreen} />
+        <Stack.Screen
+          name="DocumentViewerScreen"
+          component={DocumentViewerScreen}
+        />
         <Stack.Screen
           name="VideoSectionScreen"
           component={VideoSectionScreen}
