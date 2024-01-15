@@ -11,6 +11,7 @@ import {
 const ContentFolder = ({
   value,
   color,
+  folderId,
   subFolder,
   folderName,
   placeholder,
@@ -21,12 +22,17 @@ const ContentFolder = ({
   isForCreation,
   folderDescription,
   setShowUploadModal,
+  navigateToFilesScreen,
 }) => {
   let folder, dot, cor;
   const [toggleFolderOptions, setToggleFolderOptions] = useState(false);
 
   const toggleOptions = () => {
     setToggleFolderOptions(!toggleFolderOptions);
+  };
+
+  const handleFolderSelect = () => {
+    navigateToFilesScreen(folderId);
   };
 
   if (color === "#EEF7FE") {
@@ -69,7 +75,7 @@ const ContentFolder = ({
             </Pressable>
           )}
         </View>
-        <View style={styles.textContainer}>
+        <Pressable onPress={handleFolderSelect} style={styles.textContainer}>
           {isForCreation ? (
             <TextInput
               value={value}
@@ -83,7 +89,7 @@ const ContentFolder = ({
           <Text style={[styles.description, { color: cor }]}>
             {isForCreation ? "Agora" : folderDescription}
           </Text>
-        </View>
+        </Pressable>
       </View>
       {toggleFolderOptions && (
         <View style={styles.folderOptions}>

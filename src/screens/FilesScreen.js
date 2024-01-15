@@ -23,11 +23,23 @@ const arrangevertical = require("../../assets/arrangevertical.png");
 
 const FilesScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { folderName } = route.params;
-  const { files, loading, refetch } = useGetFiles();
 
+  const { folderId, folderName } = route.params; // Assuming folderId is passed in route params
+  const { files, loading, refetch } = useGetFiles(folderId); // Updated to use folderId
+  console.log("FILESSCREEN::::::", folderId, folderName);
   const openUrl = (url) => {
     Linking.openURL(url);
+  };
+
+  // Function to handle folder deletion
+  const handleDeleteFolder = async () => {
+    try {
+      await deleteFolderAndFiles(folderId);
+      navigation.goBack(); // Navigate back after deletion
+    } catch (error) {
+      console.error("Error deleting folder:", error);
+      // Optionally, show an error message to the user
+    }
   };
 
   const { refreshing, onRefresh } = useRefresh(refetch);
@@ -69,6 +81,10 @@ const FilesScreen = ({ route }) => {
       </View>
       {loading ? (
         <Skeleton numberOfRows={5} />
+      ) : files.length === 0 ? (
+        <View style={styles.descrView}>
+          <Text style={styles.nome}>Nenhum arquivo encontrado</Text>
+        </View>
       ) : (
         <>
           <Pressable onPress={() => navigation.navigate("VideoSectionScreen")}>
