@@ -5,95 +5,60 @@ import {
   Text,
   useWindowDimensions,
   Alert,
-  Button,
 } from "react-native";
 import OutsidePressHandler from "react-native-outside-press";
-import {
-  AudioSVG,
-  CancelSVG,
-  ExcelSVG,
-  ImageSVG,
-  PdfSVG,
-  PlusSVG,
-  TimesSVG,
-  UploadSVG,
-  VideoSVG,
-  WordSVG,
-} from "../svg";
+import { PdfSVG, TimesSVG } from "../svg";
 import { useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { FIREBASE_STORAGE } from "../../../FirebaseConfig";
 
-
 const UploadModal = ({ folderId, handleClose }) => {
   const width = useWindowDimensions().width;
-  const [selectedExcelDocuments, setSelectedExcelDocuments] = useState([]);
-  const [selectedPdfDocuments, setSelectedPdfDocuments] = useState([]);
-  const [selectedWordDocuments, setSelectedWordDocuments] = useState([]);
-  const [selectedVideoDocuments, setSelectedVideoDocuments] = useState([]);
+  const [selectedDocuments, setSelectedDocuments] = useState([]);
   console.log("Folder ID Received:", folderId);
 
-  
-  const uploadFile = async (document, fileType) => {
+  const uploadFile = async (document) => {
     try {
       if (!folderId) {
         console.error("Folder ID is undefined.");
         return;
       }
 
-      let storageRef = ref(FIREBASE_STORAGE, `folders/${folderId}/files/${document.name}`);
-  
+      let storageRef = ref(
+        FIREBASE_STORAGE,
+        `folders/${folderId}/files/${document.name}`
+      );
+
       const response = await fetch(document.uri);
       const blob = await response.blob();
-  
+
       await uploadBytes(storageRef, blob);
-  
+
       // Obter o URL de download
       const downloadURL = await getDownloadURL(storageRef);
       console.log("File uploaded successfully. Download URL:", downloadURL);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
-  };  
-  
+  };
 
-  const selectDoc = async (fileType, setDocuments) => {
+  const selectDoc = async () => {
     try {
-      let type;
-      switch (fileType) {
-        case 'excel':
-          type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-          break;
-        case 'pdf':
-          type = 'application/pdf';
-          break;
-        case 'word':
-          type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-          break;
-        case 'video':
-          type = 'video/*';
-          break;
-        default:
-          type = '*/*'; // ou um tipo de arquivo específico
-      }
-  
       const result = await DocumentPicker.getDocumentAsync({
-        type: type,
+        type: "*/*",
         multiple: true,
       });
-  
+
       if (!result.canceled) {
-        console.log(`Selected ${fileType} Documents:`, result);
-        setDocuments(result.assets || [result]); // Certifique-se de que isso funciona para todos os tipos de arquivos
-      } else {
-        console.log(`User cancelled the ${fileType} upload`);
+        console.log("Selected document:", result);
+        setSelectedDocuments(result.assets || [result]); // Update the selectedDocuments state
       }
     } catch (err) {
-      console.error(`Error picking ${fileType} documents:`, err);
+      console.error("Error picking document:", err);
     }
   };
-  
+
   const verifyFileSize = (file) => {
     if (file.size > 420000) {
       Alert.alert(
@@ -105,34 +70,21 @@ const UploadModal = ({ folderId, handleClose }) => {
     return true;
   };
 
-  const handleUpload = (fileType, selectedDocuments, folderId) => {
-    if (
-      selectedDocuments.length > 0 &&
-      !selectedDocuments.some((document) => !verifyFileSize(document))
-    ) {
-      selectedDocuments.forEach((document) =>
-        uploadFile(document, fileType, folderId)
-      );
-      Alert.alert(
-        "Ficheiro carregado com sucesso",
-        `O ficheiro ${selectedDocuments[0].name} foi carregado com sucesso.`
-      );
-      console.log("ID::::::::", folderId);
-      setSelectedExcelDocuments([]);
-      setSelectedPdfDocuments([]);
-      setSelectedWordDocuments([]);
-    } else if (selectedDocuments.length === 0) {
-      Alert.alert(
-        "Selecione um ficheiro",
-        `Nenhum ficheiro foi selecionado, por favor selecione um!.`
-      );
-    }
-    if (fileType === 'video') {
-      selectedDocuments.forEach((document) => {
+  const handleUpload = async () => {
+    console.log("Selected documents for upload:", selectedDocuments); // Debug log
+
+    if (selectedDocuments && selectedDocuments.length > 0) {
+      for (const document of selectedDocuments) {
         if (verifyFileSize(document)) {
-          uploadFile(document, 'video');
+          await uploadFile(document);
         }
-      });
+      }
+      Alert.alert(
+        "Upload Successful",
+        "Files have been uploaded successfully."
+      );
+    } else {
+      Alert.alert("No File Selected", "Please select a file to upload.");
     }
   };
 
@@ -148,79 +100,25 @@ const UploadModal = ({ folderId, handleClose }) => {
               <TimesSVG maxWidth={60} maxHeight={60} width="100%" />
             </Pressable>
           </View>
-          <Pressable
-            style={styles.fileContainer}
-            onPress={() => {
-              selectDoc("application/pdf", setSelectedPdfDocuments);
-            }}
-          >
+          <Pressable style={styles.fileContainer} onPress={selectDoc}>
             <PdfSVG maxWidth={65} maxHeight={65} width="100%" />
-            <Text style={styles.fileText}>PDF</Text>
+            <Text style={styles.fileText}>Select</Text>
           </Pressable>
-          <Pressable
-            style={styles.fileContainer}
-            onPress={() =>
-              selectDoc(
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                setSelectedWordDocuments
-              )
-            }
-          >
-            <WordSVG maxWidth={65} maxHeight={65} width="100%" />
-            <Text style={styles.fileText}>Word</Text>
-          </Pressable>
-          <Pressable
-            style={styles.fileContainer}
-            onPress={() =>
-              selectDoc(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                setSelectedExcelDocuments
-              )
-            }
-          >
-            <ExcelSVG maxWidth={65} maxHeight={65} width="100%" />
-            <Text style={styles.fileText}>Excel</Text>
-          </Pressable>
-          <Pressable
-            style={styles.fileContainer}
-            onPress={() => {
-              selectDoc('video', setSelectedVideoDocuments);
-            }}
-          >
-            <VideoSVG maxWidth={65} maxHeight={65} width="100%" />
-            <Text style={styles.fileText}>Vídeo</Text>
-          </Pressable>
-          <View style={styles.fileContainer}>
-            <AudioSVG maxWidth={65} maxHeight={65} width="100%" />
-            <Text style={styles.fileText}>Audio</Text>
-          </View>
-          <View style={styles.fileContainer}>
-            <ImageSVG maxWidth={65} maxHeight={65} width="100%" />
-            <Text style={styles.fileText}>Imagem</Text>
-          </View>
+
           <Pressable
             onPress={() => {
-              handleUpload(
-                "pdf" || "excel" || "word",
-                selectedPdfDocuments ||
-                  selectedExcelDocuments ||
-                  selectedWordDocuments
-              );
+              handleUpload(selectedDocuments);
             }}
             style={[
               styles.button,
               {
-                backgroundColor: selectedPdfDocuments ? "#567DF4" : "#C4C4C4",
+                backgroundColor: selectedDocuments ? "#567DF4" : "#C4C4C4",
               },
             ]}
           >
             <Text style={styles.textButton}>
               Carregar ficheiro
-              {selectedPdfDocuments.length > 1 ||
-              selectedExcelDocuments.length > 1 ||
-              selectedWordDocuments.length > 1
-                ? "s"
-                : ""}
+              {selectedDocuments.length > 1 ? "s" : ""}
             </Text>
           </Pressable>
         </View>
