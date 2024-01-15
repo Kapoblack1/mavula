@@ -36,6 +36,8 @@ const HomeScreen = ({ onClosePress }) => {
   const [folders, setFolders] = useState([]);
   const [newFolder, setNewFolder] = useState("");
   const colors = ["#EEF7FE", "#FFFBEC", "#FEEEEE", "#F0FFFF"];
+  const [selectedFile, setSelectedFile] = useState(null);
+
   const [creationFolder, setCreationFolder] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
@@ -180,7 +182,7 @@ const HomeScreen = ({ onClosePress }) => {
             {folders.map((folder) => (
               <Pressable
                 key={folder.id}
-                onPress={() => handleFolderSelect}
+                onPress={() => handleFolderSelect(folder.id)}
                 style={styles.folderView}
               >
                 <Folder

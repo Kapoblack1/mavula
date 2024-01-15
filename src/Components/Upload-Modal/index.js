@@ -24,44 +24,38 @@ import { useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { FIREBASE_STORAGE } from "../../../FirebaseConfig";
-const UploadModal = ({ onPress, isPressed, handleClose, folderId }) => {
+
+
+const UploadModal = ({ folderId, handleClose }) => {
   const width = useWindowDimensions().width;
   const [selectedExcelDocuments, setSelectedExcelDocuments] = useState([]);
   const [selectedPdfDocuments, setSelectedPdfDocuments] = useState([]);
   const [selectedWordDocuments, setSelectedWordDocuments] = useState([]);
   const [selectedVideoDocuments, setSelectedVideoDocuments] = useState([]);
+  console.log("Folder ID Received:", folderId);
 
-  const uploadFile = async (document, fileType, folderId) => {
+  
+  const uploadFile = async (document, fileType) => {
     try {
-      let storageRef;
-
-      switch (fileType) {
-        case "excel":
-          storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
-          break;
-        case "pdf":
-          storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
-          break;
-        case "word":
-          storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
-          break;
-        default:
-          // Handle other file types if needed
-          break;
+      if (!folderId) {
+        console.error("Folder ID is undefined.");
+        return;
       }
 
+      let storageRef = ref(FIREBASE_STORAGE, `folders/${folderId}/files/${document.name}`);
+  
       const response = await fetch(document.uri);
       const blob = await response.blob();
   
       await uploadBytes(storageRef, blob);
-
-      // Get the download URL
+  
+      // Obter o URL de download
       const downloadURL = await getDownloadURL(storageRef);
       console.log("File uploaded successfully. Download URL:", downloadURL);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
-  };
+  };  
   
 
   const selectDoc = async (fileType, setDocuments) => {

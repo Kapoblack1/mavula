@@ -28,7 +28,16 @@ const FilesScreen = ({ route }) => {
   const { files, loading, refetch } = useGetFiles(folderId); // Updated to use folderId
   console.log("FILESSCREEN::::::", folderId, folderName);
   const openUrl = (url) => {
-    Linking.openURL(url);
+    if (!url) {
+      console.error("URL not found for this file.");
+      Linking.openURL(url);
+      return;
+    }
+    Linking.openURL(url).catch((err) => {
+      console.error("Failed to open URL:", err);
+      // Optionally, show an error message to the user
+    });
+    
   };
 
   // Function to handle folder deletion
@@ -95,15 +104,15 @@ const FilesScreen = ({ route }) => {
             />
           </Pressable>
           {files.map((file, index) => (
-            <Pressable key={index} onPress={() => openUrl(file.downloadURL)}>
-              <ListFileItem
-                key={index}
-                name={file.name}
-                ext={file.ext}
-                date={file.date}
-                size={file.size}
-              />
-            </Pressable>
+        <Pressable key={index} onPress={() => openUrl(file.downloadURL)}>
+          <ListFileItem
+            key={index}
+            name={file.name}
+            ext={file.ext}
+            date={file.date}
+            size={file.size}
+          />
+        </Pressable>
           ))}
         </>
       )}
