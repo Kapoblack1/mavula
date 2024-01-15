@@ -105,6 +105,7 @@ const HomeScreen = ({ onClosePress }) => {
 
     // Delete the folder from Firestore
     try {
+       
       await deleteDoc(doc(FIREBASE_DB, "folders", folderId));
     } catch (error) {
       console.error("Error deleting folder:", error);
