@@ -25,37 +25,22 @@ import * as DocumentPicker from "expo-document-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { FIREBASE_STORAGE } from "../../../FirebaseConfig";
 
-const UploadModal = ({ onPress, isPressed, handleClose }) => {
+const UploadModal = ({ onPress, isPressed, handleClose, folderId }) => {
   const width = useWindowDimensions().width;
   const [selectedExcelDocuments, setSelectedExcelDocuments] = useState([]);
   const [selectedPdfDocuments, setSelectedPdfDocuments] = useState([]);
   const [selectedWordDocuments, setSelectedWordDocuments] = useState([]);
 
-  const uploadFile = async (document, fileType) => {
+  const uploadFile = async (document, fileType, folderId) => {
     try {
-      let storageRef;
-
-      switch (fileType) {
-        case "excel":
-          storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
-          break;
-        case "pdf":
-          storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
-          break;
-        case "word":
-          storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
-          break;
-        default:
-          // Handle other file types if needed
-          break;
-      }
+      let filePath = `folders/${folderId}/files/${document.name}`;
+      let storageRef = ref(FIREBASE_STORAGE, filePath);
+      console.log("Uploading file:", document, fileType, folderId);
 
       const response = await fetch(document.uri);
       const blob = await response.blob();
 
       await uploadBytes(storageRef, blob);
-
-      // Get the download URL
       const downloadURL = await getDownloadURL(storageRef);
 
       console.log("File uploaded successfully. Download URL:", downloadURL);
@@ -95,16 +80,19 @@ const UploadModal = ({ onPress, isPressed, handleClose }) => {
     return true;
   };
 
-  const handleUpload = (fileType, selectedDocuments) => {
+  const handleUpload = (fileType, selectedDocuments, folderId) => {
     if (
       selectedDocuments.length > 0 &&
       !selectedDocuments.some((document) => !verifyFileSize(document))
     ) {
-      selectedDocuments.forEach((document) => uploadFile(document, fileType));
+      selectedDocuments.forEach((document) =>
+        uploadFile(document, fileType, folderId)
+      );
       Alert.alert(
         "Ficheiro carregado com sucesso",
         `O ficheiro ${selectedDocuments[0].name} foi carregado com sucesso.`
       );
+      console.log("ID::::::::", folderId);
       setSelectedExcelDocuments([]);
       setSelectedPdfDocuments([]);
       setSelectedWordDocuments([]);

@@ -1,15 +1,22 @@
-import { ref, listAll, getDownloadURL, getMetadata } from "firebase/storage";
+import {
+  ref,
+  listAll,
+  getDownloadURL,
+  getMetadata,
+  deleteObject,
+} from "firebase/storage";
 import { useState, useEffect } from "react";
 import { FIREBASE_STORAGE } from "../../FirebaseConfig";
 
-const useGetFiles = () => {
+const useGetFiles = (folderId) => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchFiles = async () => {
+    setLoading(true);
     try {
-      const storageRef = ref(FIREBASE_STORAGE, "files");
-      const filesList = await listAll(storageRef);
+      const folderRef = ref(FIREBASE_STORAGE, `folders/${folderId}/files`);
+      const filesList = await listAll(folderRef);
 
       const filesPromises = filesList.items.map(async (fileRef) => {
         const downloadURL = await getDownloadURL(fileRef);
@@ -29,27 +36,22 @@ const useGetFiles = () => {
 
       const filesData = await Promise.all(filesPromises);
       setFiles(filesData);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching files:", error);
-      setLoading(false);
     }
+    setLoading(false);
   };
 
-  const getFileExtension = (filename) => {
-    return filename.split(".").pop().toLowerCase();
-  };
+  const getFileExtension = (filename) =>
+    filename.split(".").pop().toLowerCase();
 
   useEffect(() => {
-    fetchFiles();
-  }, []);
+    if (folderId) {
+      fetchFiles();
+    }
+  }, [folderId]);
 
-  const refetch = () => {
-    setLoading(true);
-    fetchFiles();
-  };
-
-  return { files, loading, refetch };
+  return { files, loading, fetchFiles };
 };
 
 export default useGetFiles;
