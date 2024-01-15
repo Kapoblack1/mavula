@@ -24,17 +24,18 @@ import { useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { FIREBASE_STORAGE } from "../../../FirebaseConfig";
-
+import * as ImagePicker from 'expo-image-picker';
 const UploadModal = ({ onPress, isPressed, handleClose }) => {
   const width = useWindowDimensions().width;
   const [selectedExcelDocuments, setSelectedExcelDocuments] = useState([]);
   const [selectedPdfDocuments, setSelectedPdfDocuments] = useState([]);
   const [selectedWordDocuments, setSelectedWordDocuments] = useState([]);
+  const [selectedVideoDocuments, setSelectedVideoDocuments] = useState([]);
 
   const uploadFile = async (document, fileType) => {
     try {
       let storageRef;
-
+  
       switch (fileType) {
         case "excel":
           storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
@@ -45,37 +46,56 @@ const UploadModal = ({ onPress, isPressed, handleClose }) => {
         case "word":
           storageRef = ref(FIREBASE_STORAGE, `files/${document.name}`);
           break;
+        case "video":
+          storageRef = ref(FIREBASE_STORAGE, `videos/${document.name}`);
+          break;
         default:
-          // Handle other file types if needed
+          // Tratamento de tipos de arquivos não especificados
           break;
       }
-
+  
       const response = await fetch(document.uri);
       const blob = await response.blob();
-
+  
       await uploadBytes(storageRef, blob);
-
+  
       // Get the download URL
       const downloadURL = await getDownloadURL(storageRef);
-
       console.log("File uploaded successfully. Download URL:", downloadURL);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
+  
 
   const selectDoc = async (fileType, setDocuments) => {
     try {
-      const docs = await DocumentPicker.getDocumentAsync({
-        type: fileType,
+      let type;
+      switch (fileType) {
+        case 'excel':
+          type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+          break;
+        case 'pdf':
+          type = 'application/pdf';
+          break;
+        case 'word':
+          type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+          break;
+        case 'video':
+          type = 'video/*';
+          break;
+        default:
+          type = '*/*'; // ou um tipo de arquivo específico
+      }
+  
+      const result = await DocumentPicker.getDocumentAsync({
+        type: type,
         multiple: true,
       });
-
-      console.log(`Selected ${fileType} Documents:`, docs);
-
-      if (!docs.canceled) {
-        setDocuments(docs.assets);
-        return docs.assets;
+  
+      if (!result.canceled) {
+        console.log(`Selected ${fileType} Documents:`, result);
+        setDocuments(result.assets || [result]); // Certifique-se de que isso funciona para todos os tipos de arquivos
       } else {
         console.log(`User cancelled the ${fileType} upload`);
       }
@@ -83,7 +103,7 @@ const UploadModal = ({ onPress, isPressed, handleClose }) => {
       console.error(`Error picking ${fileType} documents:`, err);
     }
   };
-
+  
   const verifyFileSize = (file) => {
     if (file.size > 420000) {
       Alert.alert(
@@ -113,6 +133,13 @@ const UploadModal = ({ onPress, isPressed, handleClose }) => {
         "Selecione um ficheiro",
         `Nenhum ficheiro foi selecionado, por favor selecione um!.`
       );
+    }
+    if (fileType === 'video') {
+      selectedDocuments.forEach((document) => {
+        if (verifyFileSize(document)) {
+          uploadFile(document, 'video');
+        }
+      });
     }
   };
 
@@ -161,9 +188,14 @@ const UploadModal = ({ onPress, isPressed, handleClose }) => {
             <ExcelSVG maxWidth={65} maxHeight={65} width="100%" />
             <Text style={styles.fileText}>Excel</Text>
           </Pressable>
-          <Pressable style={styles.fileContainer}>
+          <Pressable
+            style={styles.fileContainer}
+            onPress={() => {
+              selectDoc('video', setSelectedVideoDocuments);
+            }}
+          >
             <VideoSVG maxWidth={65} maxHeight={65} width="100%" />
-            <Text style={styles.fileText}>Video</Text>
+            <Text style={styles.fileText}>Vídeo</Text>
           </Pressable>
           <View style={styles.fileContainer}>
             <AudioSVG maxWidth={65} maxHeight={65} width="100%" />
