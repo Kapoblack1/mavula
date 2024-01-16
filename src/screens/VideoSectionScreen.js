@@ -79,7 +79,7 @@ export default function VideoSectionScreen() {
               videoName: video.name,
               videoSize: video.size,
               videoTime: video.time,
-              videoUrl: video.Url,
+              videoUrl: video.url,
               videoGenre: video.genre,
               videoThumbnail: video.thumbnail,
               videoDescription: video.description,

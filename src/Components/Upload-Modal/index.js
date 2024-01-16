@@ -127,7 +127,7 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
         name: videoName,
         genre: videoGenre,
         description: "Your video description here", // Replace with actual description
-        fileURL: videoFileURL,
+        url: videoFileURL,
         thumbnailURL: thumbnailURL
       };
   
