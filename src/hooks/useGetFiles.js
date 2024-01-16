@@ -45,13 +45,17 @@ const useGetFiles = (folderId) => {
   const getFileExtension = (filename) =>
     filename.split(".").pop().toLowerCase();
 
-  useEffect(() => {
-    if (folderId) {
+    const refetch = () => {
       fetchFiles();
-    }
-  }, [folderId]);
+    };
 
-  return { files, loading, fetchFiles };
+    useEffect(() => {
+      if (folderId) {
+        fetchFiles();
+      }
+    }, [folderId]);
+
+    return { files, loading, fetchFiles, refetch };
 };
 
 export default useGetFiles;

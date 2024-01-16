@@ -13,7 +13,7 @@ import {
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Folder from "../Components/ContentFolder";
 import { useNavigation } from "@react-navigation/native";
-import AddButton from "../Components/Add-Button";
+import ActionButton from "../Components/Action-Button";
 import OutsidePressHandler from "react-native-outside-press";
 import { FOLDERS } from "../mocks/folders";
 import UploadModal from "../Components/Upload-Modal";
@@ -23,6 +23,7 @@ import {
   FIREBASE_DB,
   FIREBASE_STORAGE,
 } from "../../FirebaseConfig";
+import { PlusSVG } from "../Components/svg";
 
 const menuIcon = require("../../assets/menu.png");
 const arrow = require("../../assets/arrowdown.png");
@@ -36,7 +37,6 @@ const HomeScreen = ({ onClosePress }) => {
   const [folders, setFolders] = useState([]);
   const [newFolder, setNewFolder] = useState("");
   const colors = ["#EEF7FE", "#FFFBEC", "#FEEEEE", "#F0FFFF"];
-  const [selectedFile, setSelectedFile] = useState(null);
 
   const [creationFolder, setCreationFolder] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -82,7 +82,6 @@ const HomeScreen = ({ onClosePress }) => {
       setColorIndex((colorIndex + 1) % colors.length);
       setNewFolder("");
     }
-    setCreationFolder(false);
   };
 
   const navigateToFilesScreen = (folderId, folderName) => {
@@ -122,7 +121,10 @@ const HomeScreen = ({ onClosePress }) => {
   return (
     <>
       <Pressable
-        onPress={addFolderToFirestore}
+        onPress={() => {
+          addFolderToFirestore();
+          setCreationFolder(false);
+        }}
         style={[
           { backgroundColor: "#FFF", height: height, width: width },
           styles.pag,
@@ -200,9 +202,10 @@ const HomeScreen = ({ onClosePress }) => {
             ))}
           </View>
         </ScrollView>
-        <AddButton
+        <ActionButton
           onPress={() => setCreationFolder(!creationFolder)}
           isPressed={creationFolder}
+          Icon={PlusSVG}
         />
       </Pressable>
       {showUploadModal && (

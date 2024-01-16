@@ -13,7 +13,8 @@ import * as DocumentPicker from "expo-document-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { FIREBASE_STORAGE } from "../../../FirebaseConfig";
 
-const UploadModal = ({ folderId, handleClose }) => {
+const UploadModal = ({ folderId, handleClose, refetch }) => {
+  const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
   const [selectedDocuments, setSelectedDocuments] = useState([]);
   console.log("Folder ID Received:", folderId);
@@ -60,7 +61,8 @@ const UploadModal = ({ folderId, handleClose }) => {
   };
 
   const verifyFileSize = (file) => {
-    if (file.size > 420000) {
+    if (file.size > 3020000) {
+      // 3020000 bytes = 2.88 MB
       Alert.alert(
         "Ficheiro demasiado grande",
         `O ficheiro ${file.name} é demasiado grande. Por favor carregue um ficheiro com temanho menor à 420000 bytes.`
@@ -79,6 +81,7 @@ const UploadModal = ({ folderId, handleClose }) => {
           await uploadFile(document);
         }
       }
+      refetch();
       Alert.alert(
         "Upload Successful",
         "Files have been uploaded successfully."
@@ -92,7 +95,7 @@ const UploadModal = ({ folderId, handleClose }) => {
     <>
       <OutsidePressHandler
         onOutsidePress={handleClose}
-        style={[{ width: width }, styles.modalContainer]}
+        style={[{ width: width, height: height }, styles.modalContainer]}
       >
         <View style={styles.modal}>
           <View style={styles.closeBtn}>
@@ -131,9 +134,9 @@ export default UploadModal;
 
 const styles = StyleSheet.create({
   plusIcon: {
-    position: "absolute",
-    bottom: 40,
     right: 40,
+    bottom: 40,
+    position: "absolute",
   },
   modalContainer: {
     left: 0,
