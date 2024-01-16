@@ -5,6 +5,7 @@ import {
   Text,
   useWindowDimensions,
   Alert,
+  TextInput,
 } from "react-native";
 import OutsidePressHandler from "react-native-outside-press";
 import { PdfSVG, TimesSVG } from "../svg";
@@ -12,12 +13,17 @@ import { useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { FIREBASE_STORAGE } from "../../../FirebaseConfig";
-
+import { collection, addDoc } from "firebase/firestore";
+import { FIREBASE_DB } from "../../../FirebaseConfig";
 const UploadModal = ({ folderId, handleClose, refetch }) => {
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
   const [selectedDocuments, setSelectedDocuments] = useState([]);
   console.log("Folder ID Received:", folderId);
+  const [isVideo, setIsVideo] = useState(false);
+  const [videoName, setVideoName] = useState("");
+  const [videoGenre, setVideoGenre] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
 
   const uploadFile = async (document) => {
     try {
@@ -44,6 +50,29 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
     }
   };
 
+  const saveVideoInfo = async (videoUrl, thumbnailUrl) => {
+    try {
+      if (!videoUrl || !thumbnailUrl) {
+        console.error("URLs de vídeo ou thumbnail não fornecidos.");
+        return;
+      }
+
+      const videoData = {
+        name: videoName,
+        genre: videoGenre,
+        thumbnail: thumbnailUrl,
+        url: videoUrl,
+      };
+
+      await addDoc(collection(FIREBASE_DB, "videos"), videoData);
+      console.log("Informações do vídeo salvas com sucesso:", videoData);
+      Alert.alert("Sucesso", "Informações do vídeo salvas com sucesso.");
+    } catch (error) {
+      console.error("Erro ao salvar informações do vídeo no Firestore:", error);
+      Alert.alert("Erro", "Falha ao salvar informações do vídeo.");
+    }
+  };
+
   const selectDoc = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -55,13 +84,20 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
         console.log("Selected document:", result);
         setSelectedDocuments(result.assets || [result]); // Update the selectedDocuments state
       }
+      if (!result.canceled) {
+        const isVideoFile = result.assets.some((asset) =>
+          asset.mimeType.startsWith("video/")
+        );
+        setIsVideo(isVideoFile);
+        setSelectedDocuments(result.assets || [result]);
+      }
     } catch (err) {
       console.error("Error picking document:", err);
     }
   };
 
   const verifyFileSize = (file) => {
-    if (file.size > 3020000) {
+    if (file.size > 302000000) {
       // 3020000 bytes = 2.88 MB
       Alert.alert(
         "Ficheiro demasiado grande",
@@ -73,24 +109,60 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
   };
 
   const handleUpload = async () => {
-    console.log("Selected documents for upload:", selectedDocuments); // Debug log
+    console.log("Selected documents for upload:", selectedDocuments);
 
-    if (selectedDocuments && selectedDocuments.length > 0) {
+    if (!selectedDocuments.length) {
+      Alert.alert("No File Selected", "Please select a file to upload.");
+      return;
+    }
+
+    try {
+      let videoUrl = "",
+        thumbnailUrl = "";
+
+      // Upload the video and thumbnail files
       for (const document of selectedDocuments) {
-        if (verifyFileSize(document)) {
-          await uploadFile(document);
+        if (!verifyFileSize(document)) continue;
+
+        await uploadFile(document);
+        const fileURL = await getDownloadURL(
+          ref(FIREBASE_STORAGE, `folders/${folderId}/files/${document.name}`)
+        );
+
+        if (document.mimeType.startsWith("video/")) {
+          videoUrl = fileURL;
         }
       }
-      refetch();
-      Alert.alert(
-        "Upload Successful",
-        "Files have been uploaded successfully."
-      );
-    } else {
-      Alert.alert("No File Selected", "Please select a file to upload.");
+
+      if (isVideo && thumbnail) {
+        await uploadFile({ name: `${videoName}-thumbnail`, uri: thumbnail });
+        thumbnailUrl = await getDownloadURL(
+          ref(
+            FIREBASE_STORAGE,
+            `folders/${folderId}/files/${videoName}-thumbnail`
+          )
+        );
+
+        if (!videoUrl) {
+          console.error("URL do vídeo não está disponível.");
+          Alert.alert("Erro", "URL do vídeo não encontrado.");
+          return;
+        }
+
+        await saveVideoInfo(videoUrl, thumbnailUrl);
+      }
+    } catch (error) {
+      console.error("Error during the upload process:", error);
+      Alert.alert("Upload Failed", "There was an issue uploading the files.");
     }
   };
 
+  const selectThumbnail = async () => {
+    const result = await DocumentPicker.getDocumentAsync({ type: "image/*" });
+    if (!result.canceled) {
+      setThumbnail(result.uri);
+    }
+  };
   return (
     <>
       <OutsidePressHandler
@@ -124,6 +196,25 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
               {selectedDocuments.length > 1 ? "s" : ""}
             </Text>
           </Pressable>
+          {isVideo && (
+            <View style={styles.videoInfoForm}>
+              <TextInput
+                style={styles.input}
+                placeholder="Name"
+                value={videoName}
+                onChangeText={setVideoName}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Genre"
+                value={videoGenre}
+                onChangeText={setVideoGenre}
+              />
+              <Pressable onPress={selectThumbnail}>
+                <Text>Select Thumbnail</Text>
+              </Pressable>
+            </View>
+          )}
         </View>
       </OutsidePressHandler>
     </>
@@ -154,6 +245,7 @@ const styles = StyleSheet.create({
   },
   modal: {
     gap: 30,
+    flex: 1,
     width: "80%",
     height: "45%",
     paddingTop: 50,
