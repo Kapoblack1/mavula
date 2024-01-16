@@ -11,10 +11,12 @@ import OutsidePressHandler from "react-native-outside-press";
 import { PdfSVG, TimesSVG } from "../svg";
 import { useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, storageRef } from "firebase/storage";
 import { FIREBASE_STORAGE } from "../../../FirebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
-import { FIREBASE_DB } from "../../../FirebaseConfig";
+import { FIREBASE_DB } from '../../../FirebaseConfig';
+import { collection, addDoc } from 'firebase/firestore';
+
+
 const UploadModal = ({ folderId, handleClose, refetch }) => {
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
@@ -25,53 +27,40 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
   const [videoGenre, setVideoGenre] = useState("");
   const [thumbnail, setThumbnail] = useState("");
 
-  const uploadFile = async (document) => {
+  const uploadFile = async (document, isThumbnail = false) => {
     try {
       if (!folderId) {
         console.error("Folder ID is undefined.");
         return;
       }
-
-      let storageRef = ref(
-        FIREBASE_STORAGE,
-        `folders/${folderId}/files/${document.name}`
-      );
-
+  
+      const fileRef = ref(FIREBASE_STORAGE, `folders/${folderId}/files/${document.name}`);
+  
       const response = await fetch(document.uri);
       const blob = await response.blob();
-
-      await uploadBytes(storageRef, blob);
-
-      // Obter o URL de download
-      const downloadURL = await getDownloadURL(storageRef);
-      console.log("File uploaded successfully. Download URL:", downloadURL);
+  
+      await uploadBytes(fileRef, blob);
+  
+      const downloadURL = await getDownloadURL(fileRef);
+  
+      return downloadURL; // Return the URL for both thumbnail and video
     } catch (error) {
       console.error("Error uploading file:", error);
+      return null; // Return null if there is an error
     }
   };
-
-  const saveVideoInfo = async (videoUrl, thumbnailUrl) => {
+  
+  const saveVideoData = async (videoData) => {
     try {
-      if (!videoUrl || !thumbnailUrl) {
-        console.error("URLs de vídeo ou thumbnail não fornecidos.");
-        return;
-      }
-
-      const videoData = {
-        name: videoName,
-        genre: videoGenre,
-        thumbnail: thumbnailUrl,
-        url: videoUrl,
-      };
-
-      await addDoc(collection(FIREBASE_DB, "videos"), videoData);
-      console.log("Informações do vídeo salvas com sucesso:", videoData);
-      Alert.alert("Sucesso", "Informações do vídeo salvas com sucesso.");
-    } catch (error) {
-      console.error("Erro ao salvar informações do vídeo no Firestore:", error);
-      Alert.alert("Erro", "Falha ao salvar informações do vídeo.");
+      const docRef = await addDoc(collection(FIREBASE_DB, 'videos'), videoData);
+      console.log("Document written with ID: ", docRef.id);
+      return docRef.id; // Returning the document ID for any further use
+    } catch (e) {
+      console.error("Error adding document to Firestore: ", e);
+      throw e; // Re-throw the error for calling function to handle
     }
   };
+
 
   const selectDoc = async () => {
     try {
@@ -109,53 +98,49 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
   };
 
   const handleUpload = async () => {
-    console.log("Selected documents for upload:", selectedDocuments);
-
-    if (!selectedDocuments.length) {
+    console.log("Selected documents for upload:", selectedDocuments); // Debug log
+  
+    let videoFileURL = "";
+    let thumbnailURL = "";
+  
+    if (selectedDocuments && selectedDocuments.length > 0) {
+      for (const document of selectedDocuments) {
+        if (verifyFileSize(document)) {
+          const isThumbnail = document === thumbnail; // Check if the current document is the thumbnail
+          const uploadedURL = await uploadFile(document, isThumbnail);
+  
+          if (isThumbnail) {
+            thumbnailURL = uploadedURL;
+          } else if (isVideo) {
+            videoFileURL = uploadedURL; // Save video file URL if it's a video
+          }
+        }
+      }
+    } else {
       Alert.alert("No File Selected", "Please select a file to upload.");
       return;
     }
-
-    try {
-      let videoUrl = "",
-        thumbnailUrl = "";
-
-      // Upload the video and thumbnail files
-      for (const document of selectedDocuments) {
-        if (!verifyFileSize(document)) continue;
-
-        await uploadFile(document);
-        const fileURL = await getDownloadURL(
-          ref(FIREBASE_STORAGE, `folders/${folderId}/files/${document.name}`)
-        );
-
-        if (document.mimeType.startsWith("video/")) {
-          videoUrl = fileURL;
-        }
-      }
-
-      if (isVideo && thumbnail) {
-        await uploadFile({ name: `${videoName}-thumbnail`, uri: thumbnail });
-        thumbnailUrl = await getDownloadURL(
-          ref(
-            FIREBASE_STORAGE,
-            `folders/${folderId}/files/${videoName}-thumbnail`
-          )
-        );
-
-        if (!videoUrl) {
-          console.error("URL do vídeo não está disponível.");
-          Alert.alert("Erro", "URL do vídeo não encontrado.");
-          return;
-        }
-
-        await saveVideoInfo(videoUrl, thumbnailUrl);
-      }
-    } catch (error) {
-      console.error("Error during the upload process:", error);
-      Alert.alert("Upload Failed", "There was an issue uploading the files.");
+  
+    if (isVideo) {
+      // Update video metadata with the video and thumbnail URLs
+      const videoData = {
+        name: videoName,
+        genre: videoGenre,
+        description: "Your video description here", // Replace with actual description
+        fileURL: videoFileURL,
+        thumbnailURL: thumbnailURL
+      };
+  
+      await saveVideoData(videoData);
     }
+  
+    refetch();
+    Alert.alert(
+      "Upload Successful",
+      "Files have been uploaded successfully."
+    );
   };
+  
 
   const selectThumbnail = async () => {
     const result = await DocumentPicker.getDocumentAsync({ type: "image/*" });
