@@ -9,6 +9,7 @@ import {
   Pressable,
   Linking,
   RefreshControl,
+  useWindowDimensions,
 } from "react-native";
 import ListFileItem from "../Components/List-File-Item";
 import { useNavigation } from "@react-navigation/native";
@@ -16,14 +17,20 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useGetFiles, useRefresh } from "../hooks";
 import Skeleton from "../Components/Skeleton";
 import { getDownloadURL } from "@firebase/storage";
+import ActionButton from "../Components/Action-Button";
+import { DotsSVG } from "../Components/svg";
+import UploadModal from "../Components/Upload-Modal";
+import { useState } from "react";
 
 const arrow = require("../../assets/arrowleft.png");
 const menu = require("../../assets/menu1.png");
 const arrangevertical = require("../../assets/arrangevertical.png");
 
 const FilesScreen = ({ route }) => {
+  const height = useWindowDimensions().height;
+  const width = useWindowDimensions().width;
   const navigation = useNavigation();
-
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const { folderId, folderName } = route.params; // Assuming folderId is passed in route params
   const { files, loading, refetch } = useGetFiles(folderId); // Updated to use folderId
   console.log("FILESSCREEN::::::", folderId, folderName);
@@ -37,19 +44,9 @@ const FilesScreen = ({ route }) => {
       console.error("Failed to open URL:", err);
       // Optionally, show an error message to the user
     });
-    
   };
 
-  // Function to handle folder deletion
-  const handleDeleteFolder = async () => {
-    try {
-      await deleteFolderAndFiles(folderId);
-      navigation.goBack(); // Navigate back after deletion
-    } catch (error) {
-      console.error("Error deleting folder:", error);
-      // Optionally, show an error message to the user
-    }
-  };
+  const handleClose = () => setShowUploadModal(false);
 
   const { refreshing, onRefresh } = useRefresh(refetch);
 
@@ -58,7 +55,7 @@ const FilesScreen = ({ route }) => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
-      style={styles.container1}
+      style={[styles.container1, { height: height, width: width }]}
     >
       <View style={styles.container}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -104,17 +101,25 @@ const FilesScreen = ({ route }) => {
             />
           </Pressable>
           {files.map((file, index) => (
-        <Pressable key={index} onPress={() => openUrl(file.downloadURL)}>
-          <ListFileItem
-            key={index}
-            name={file.name}
-            ext={file.ext}
-            date={file.date}
-            size={file.size}
-          />
-        </Pressable>
+            <Pressable key={index} onPress={() => openUrl(file.downloadURL)}>
+              <ListFileItem
+                key={index}
+                name={file.name}
+                ext={file.ext}
+                date={file.date}
+                size={file.size}
+              />
+            </Pressable>
           ))}
         </>
+      )}
+      <ActionButton onPress={() => setShowUploadModal(true)} Icon={DotsSVG} />
+      {showUploadModal && (
+        <UploadModal
+          refetch={refetch}
+          folderId={folderId}
+          handleClose={handleClose}
+        />
       )}
     </ScrollView>
   );
@@ -133,7 +138,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   container1: {
+    position: "relative",
     backgroundColor: "white",
+    height: 400,
+    flex: 1,
   },
   menuStyle: {
     marginRight: 10,
@@ -225,3 +233,4 @@ const styles = StyleSheet.create({
     fontSize: 9,
   },
 });
+
