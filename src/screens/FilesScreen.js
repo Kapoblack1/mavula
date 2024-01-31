@@ -113,7 +113,9 @@ const FilesScreen = ({ route }) => {
           ))}
         </>
       )}
-      <ActionButton onPress={() => setShowUploadModal(true)} Icon={DotsSVG} />
+      <View style={{ position: "absolute", bottom: -300, right: 10 }}>
+        <ActionButton onPress={() => setShowUploadModal(true)} Icon={DotsSVG} />
+      </View>
       {showUploadModal && (
         <UploadModal
           refetch={refetch}
@@ -140,7 +142,6 @@ const styles = StyleSheet.create({
   container1: {
     position: "relative",
     backgroundColor: "white",
-    height: 400,
     flex: 1,
   },
   menuStyle: {
