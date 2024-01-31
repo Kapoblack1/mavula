@@ -11,7 +11,6 @@ import React, { useState } from "react";
 import { ArrowDownSVG, ArrowLeftSVG, DotsSVG } from "../Components/svg";
 import { FILES } from "../mocks/files";
 import { Video } from "expo-av";
-
 const VideoReproductionScreen = ({ route }) => {
   const navigation = useNavigation();
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(true);

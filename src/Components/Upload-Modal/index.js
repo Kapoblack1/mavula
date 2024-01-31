@@ -98,48 +98,47 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
   };
 
   const handleUpload = async () => {
-    console.log("Selected documents for upload:", selectedDocuments); // Debug log
-  
-    let videoFileURL = "";
-    let thumbnailURL = "";
-  
-    if (selectedDocuments && selectedDocuments.length > 0) {
-      for (const document of selectedDocuments) {
-        if (verifyFileSize(document)) {
-          const isThumbnail = document === thumbnail; // Check if the current document is the thumbnail
-          const uploadedURL = await uploadFile(document, isThumbnail);
-  
-          if (isThumbnail) {
-            thumbnailURL = uploadedURL;
-          } else if (isVideo) {
-            videoFileURL = uploadedURL; // Save video file URL if it's a video
-          }
+  console.log("Selected documents for upload:", selectedDocuments);
+
+  let videoFileURL = "";
+  let thumbnailURL = "";
+
+  if (selectedDocuments && selectedDocuments.length > 0) {
+    for (const document of selectedDocuments) {
+      if (verifyFileSize(document)) {
+        const uploadedURL = await uploadFile(document, document.uri === thumbnail);
+        if (document.uri === thumbnail) {
+          thumbnailURL = uploadedURL; // Store the thumbnail URL
+        } else if (isVideo) {
+          videoFileURL = uploadedURL; // Store the video file URL
         }
       }
-    } else {
-      Alert.alert("No File Selected", "Please select a file to upload.");
-      return;
     }
-  
-    if (isVideo) {
-      // Update video metadata with the video and thumbnail URLs
-      const videoData = {
-        name: videoName,
-        genre: videoGenre,
-        description: "Your video description here", // Replace with actual description
-        url: videoFileURL,
-        thumbnailURL: thumbnailURL
-      };
-  
-      await saveVideoData(videoData);
-    }
-  
-    refetch();
-    Alert.alert(
-      "Upload Successful",
-      "Files have been uploaded successfully."
-    );
-  };
+  } else {
+    Alert.alert("No File Selected", "Please select a file to upload.");
+    return;
+  }
+
+  if (isVideo) {
+    // Update video metadata with the video and thumbnail URLs
+    const videoData = {
+      name: videoName,
+      genre: videoGenre,
+      description: "Your video description here", // Replace with actual description
+      url: videoFileURL,
+      thumbnail: thumbnailURL // Assigning the thumbnail URL here
+    };
+
+    await saveVideoData(videoData);
+  }
+
+  refetch();
+  Alert.alert(
+    "Upload Successful",
+    "Files have been uploaded successfully."
+  );
+};
+
   
 
   const selectThumbnail = async () => {
