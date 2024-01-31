@@ -7,23 +7,35 @@ import {
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import React, { useState } from "react";
 import { ArrowDownSVG, ArrowLeftSVG, DotsSVG } from "../Components/svg";
 import { FILES } from "../mocks/files";
+import { Video } from "expo-av";
 
 const VideoReproductionScreen = ({ route }) => {
   const navigation = useNavigation();
+  const [isThumbnailVisible, setIsThumbnailVisible] = useState(true);
+
   const [toggleDescription, setToggleDescription] = useState(false);
   const {
-    videoName,
-    videoDescription,
-    videoThumbnail,
-    videoGenre,
     views,
-    videoSize,
+    videoUrl,
+    videoName,
     videoTime,
+    videoSize,
+    videoGenre,
+    videoThumbnail,
+    videoDescription,
   } = route.params;
 
+  const PlayButton = ({ onPress }) => {
+    return (
+      <Pressable onPress={onPress} style={styles.playButton}>
+        {/* You can use an image or an icon here */}
+        <Text style={styles.playButtonText}>▶</Text>
+      </Pressable>
+    );
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -43,11 +55,26 @@ const VideoReproductionScreen = ({ route }) => {
       </View>
       <ScrollView style={styles.videoSection}>
         <View style={styles.video}>
-          <Image
-            source={{ uri: videoThumbnail }}
-            resizeMode="cover"
+          <Video
+            source={{ uri: videoUrl }}
+            resizeMode="contain"
             style={{ flex: 1 }}
+            useNativeControls
+            isLooping
+            onPlaybackStatusUpdate={(status) =>
+              setIsThumbnailVisible(!status.isPlaying)
+            }
           />
+          {isThumbnailVisible && (
+            <>
+              <Image
+                source={{ uri: videoThumbnail }}
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="cover"
+              />
+              <PlayButton onPress={() => setIsThumbnailVisible(false)} />
+            </>
+          )}
         </View>
         <View style={styles.videoInfo}>
           <Text style={styles.videoInfoText}>
@@ -200,5 +227,17 @@ const styles = StyleSheet.create({
   normalText: {
     fontSize: 16,
   },
+  playButton: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  playButtonText: {
+    fontSize: 60,
+    color: 'white',
+  },
 });
-

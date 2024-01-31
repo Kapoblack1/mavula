@@ -11,12 +11,37 @@ import {
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 import { FILES } from "../mocks/files";
+import { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { FIREBASE_DB } from '../../FirebaseConfig';
 
 const arrow = require("../../assets/arrowleft.png");
 const menu = require("../../assets/menu1.png");
 
 export default function VideoSectionScreen() {
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(FIREBASE_DB, "videos"));
+        const videosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log("Fetched Videos:", videosData); // Debugging log
+        setVideos(videosData);
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      }
+    };
+  
+    fetchVideos();
+  }, []);
+
+  if (loading) {
+    return <Text>Loading videos...</Text>; // Or any other loading indicator
+  }
+
   return (
     <ScrollView style={styles.pag}>
       <View style={styles.container}>
@@ -45,31 +70,32 @@ export default function VideoSectionScreen() {
         </View>
       </View>
 
-      {FILES.filter((file) => file.ext === "mp4").map((file, index) => (
+      {videos.map((video, index) => (
         <Pressable
           key={index}
           onPress={() =>
             navigation.navigate("VideoReproductionScreen", {
-              views: file.views,
-              videoName: file.name,
-              videoSize: file.size,
-              videoTime: file.time,
-              videoGenre: file.genre,
-              videoThumbnail: file.thumbnail,
-              videoDescription: file.description,
+              views: video.views,
+              videoName: video.name,
+              videoSize: video.size,
+              videoTime: video.time,
+              videoUrl: video.url,
+              videoGenre: video.genre,
+              videoThumbnail: video.thumbnail,
+              videoDescription: video.description,
             })
           }
         >
           <View style={styles.videoContainer}>
             <Image
-              source={{ uri: file.thumbnail }}
+              source={{ uri: video.thumbnail }}
               resizeMode="contain"
               style={styles.videoStyle}
             />
             <View style={styles.videoInfoContainer}>
-              <Text style={styles.minhaConta}>{file.name}</Text>
-              <Text style={styles.minhaConta}>{file.time}</Text>
-              <Text style={styles.minhaConta}>{file.size}</Text>
+              <Text style={styles.minhaConta}>{video.name}</Text>
+              <Text style={styles.minhaConta}>{video.time}</Text>
+              <Text style={styles.minhaConta}>{video.size}</Text>
             </View>
           </View>
         </Pressable>
