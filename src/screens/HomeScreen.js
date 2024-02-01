@@ -33,14 +33,15 @@ const HomeScreen = ({ onClosePress }) => {
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
   const navigation = useNavigation();
+  const [localSearchTerm, setLocalSearchTerm] = useState("");
   const [colorIndex, setColorIndex] = useState(0);
   const [folders, setFolders] = useState([]);
   const [newFolder, setNewFolder] = useState("");
-  const colors = ["#EEF7FE", "#FFFBEC", "#FEEEEE", "#F0FFFF"];
-
-  const [creationFolder, setCreationFolder] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
+  const colors = ["#EEF7FE", "#FFFBEC", "#FEEEEE", "#F0FFFF"];
+  const [creationFolder, setCreationFolder] = useState(false);
 
   const userId = FIREBASE_AUTH.currentUser?.uid; // Assuming FIREBASE_AUTH is correctly imported
 
@@ -104,7 +105,6 @@ const HomeScreen = ({ onClosePress }) => {
 
     // Delete the folder from Firestore
     try {
-       
       await deleteDoc(doc(FIREBASE_DB, "folders", folderId));
     } catch (error) {
       console.error("Error deleting folder:", error);
@@ -118,6 +118,12 @@ const HomeScreen = ({ onClosePress }) => {
     setSelectedFolderId(folderId);
     setShowUploadModal(true);
   };
+
+  // Filtrar pastas com base no termo de pesquisa
+  const filteredFolders = folders.filter((folder) =>
+    folder.name.toLowerCase().includes(localSearchTerm.toLowerCase())
+  );
+
 
   return (
     <>
@@ -148,10 +154,12 @@ const HomeScreen = ({ onClosePress }) => {
             />
             <TextInput
               inputMode="search"
-              placeholder="Pesquisa pasta"
+              placeholder="Pesquisar pasta"
               style={styles.input}
               placeholderTextColor="black"
               fontSize={16}
+              value={localSearchTerm}  // Alteração aqui
+              onChangeText={(text) => setLocalSearchTerm(text)}  // Alteração aqui
             />
           </View>
         </View>
@@ -182,7 +190,7 @@ const HomeScreen = ({ onClosePress }) => {
                 />
               </Pressable>
             )}
-            {folders.map((folder) => (
+            {filteredFolders.map((folder) => (
               <Pressable
                 key={folder.id}
                 onPress={() => handleFolderSelect(folder.id)}
@@ -253,7 +261,6 @@ const styles = StyleSheet.create({
     height: 45,
     resizeMode: "contain",
   },
-  filtro: {},
   filtro: {},
   div: {
     marginBottom: 30,
