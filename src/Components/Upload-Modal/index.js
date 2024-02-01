@@ -164,7 +164,19 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
             Clique para selecionar ficheiro(s)
           </Text>
         </Pressable>
-
+        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          {selectedDocuments.length > 1 && (
+            <>
+              <Text>Seleção:</Text>
+              {selectedDocuments.map((item, index) => (
+                <Text key={index}>
+                  {item.name}
+                  {index === -index ? ", " : ""}
+                </Text>
+              ))}
+            </>
+          )}
+        </View>
         <Pressable
           onPress={() => {
             handleUpload(selectedDocuments);
