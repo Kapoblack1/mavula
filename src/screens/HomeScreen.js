@@ -14,49 +14,63 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Folder from "../Components/ContentFolder";
 import { useNavigation } from "@react-navigation/native";
 import ActionButton from "../Components/Action-Button";
-import OutsidePressHandler from "react-native-outside-press";
-import { FOLDERS } from "../mocks/folders";
 import UploadModal from "../Components/Upload-Modal";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
 import {
   FIREBASE_AUTH,
   FIREBASE_DB,
   FIREBASE_STORAGE,
 } from "../../FirebaseConfig";
 import { PlusSVG } from "../Components/svg";
+import { useUserRole } from "../hooks";
+import { deleteObject, listAll, ref } from "@firebase/storage";
 
 const menuIcon = require("../../assets/menu.png");
 const arrow = require("../../assets/arrowdown.png");
 const filtro = require("../../assets/filtro.png");
 
 const HomeScreen = ({ onClosePress }) => {
+  const userId = FIREBASE_AUTH.currentUser?.uid;
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
   const navigation = useNavigation();
-  const [localSearchTerm, setLocalSearchTerm] = useState("");
   const [colorIndex, setColorIndex] = useState(0);
   const [folders, setFolders] = useState([]);
   const [newFolder, setNewFolder] = useState("");
+  const colors = ["#EEF7FE", "#FFFBEC", "#FEEEEE", "#F0FFFF"];
+  const role = useUserRole(userId);
+  const [creationFolder, setCreationFolder] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [localSearchTerm, setLocalSearchTerm] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
-  const colors = ["#EEF7FE", "#FFFBEC", "#FEEEEE", "#F0FFFF"];
-  const [creationFolder, setCreationFolder] = useState(false);
 
-  const userId = FIREBASE_AUTH.currentUser?.uid; // Assuming FIREBASE_AUTH is correctly imported
-
+  const isStudent = role === "student";
   // Fetch folders from Firestore
   useEffect(() => {
     const fetchFolders = async () => {
       const q = query(
         collection(FIREBASE_DB, "folders"),
-        where("userId", "==", userId)
+        // where("userId", "==", userId)
       );
       const querySnapshot = await getDocs(q);
-      const foldersData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const foldersData = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate(), // Convert timestamp to JavaScript Date object
+        };
+      });
       setFolders(foldersData);
     };
 
@@ -70,7 +84,7 @@ const HomeScreen = ({ onClosePress }) => {
         name: newFolder,
         color: colors[colorIndex],
         completed: false,
-        description: "Agora mesmo",
+        createdAt: serverTimestamp(),
         userId: userId,
       };
       const docRef = await addDoc(
@@ -82,6 +96,7 @@ const HomeScreen = ({ onClosePress }) => {
 
       setColorIndex((colorIndex + 1) % colors.length);
       setNewFolder("");
+      console.log("Role:::::::", role);
     }
   };
 
@@ -90,7 +105,7 @@ const HomeScreen = ({ onClosePress }) => {
     console.log("folderId", folderId, "folderName", folderName);
   };
 
-  deleteFolderAndFiles = async (folderId) => {
+  const deleteFolderAndFiles = async (folderId) => {
     // Delete all files in the folder from Firebase Storage
     try {
       const folderRef = ref(FIREBASE_STORAGE, `folders/${folderId}/files`);
@@ -116,14 +131,11 @@ const HomeScreen = ({ onClosePress }) => {
 
   const handleFolderSelect = (folderId) => {
     setSelectedFolderId(folderId);
-    setShowUploadModal(true);
   };
 
-  // Filtrar pastas com base no termo de pesquisa
   const filteredFolders = folders.filter((folder) =>
-    folder.name.toLowerCase().includes(localSearchTerm.toLowerCase())
+  folder.name.toLowerCase().includes(localSearchTerm.toLowerCase())
   );
-
 
   return (
     <>
@@ -154,12 +166,12 @@ const HomeScreen = ({ onClosePress }) => {
             />
             <TextInput
               inputMode="search"
-              placeholder="Pesquisar pasta"
+              placeholder="Pesquisa pasta"
               style={styles.input}
               placeholderTextColor="black"
-              fontSize={16}
               value={localSearchTerm}  // Alteração aqui
               onChangeText={(text) => setLocalSearchTerm(text)}  // Alteração aqui
+              fontSize={16}
             />
           </View>
         </View>
@@ -200,9 +212,11 @@ const HomeScreen = ({ onClosePress }) => {
                   color={folder.color}
                   folderId={folder.id}
                   folderName={folder.name}
-                  folderDescription={folder.description}
-                  setShowUploadModal={setShowUploadModal}
-                  deleteFolder={() => deleteFolderAndFiles(folder.id)}
+                  folderDescription={folder.createdAt?.toDateString()}
+                  setShowUploadModal={!isStudent && setShowUploadModal}
+                  deleteFolder={() => {
+                    !isStudent && deleteFolderAndFiles(folder.id);
+                  }}
                   navigateToFilesScreen={() =>
                     navigateToFilesScreen(folder.id, folder.name)
                   }
@@ -211,11 +225,13 @@ const HomeScreen = ({ onClosePress }) => {
             ))}
           </View>
         </ScrollView>
-        <ActionButton
-          onPress={() => setCreationFolder(!creationFolder)}
-          isPressed={creationFolder}
-          Icon={PlusSVG}
-        />
+        {!isStudent && (
+          <ActionButton
+            onPress={() => setCreationFolder(!creationFolder)}
+            isPressed={creationFolder}
+            Icon={PlusSVG}
+          />
+        )}
       </Pressable>
       {showUploadModal && (
         <UploadModal folderId={selectedFolderId} handleClose={handleClose} />
@@ -261,6 +277,7 @@ const styles = StyleSheet.create({
     height: 45,
     resizeMode: "contain",
   },
+  filtro: {},
   filtro: {},
   div: {
     marginBottom: 30,

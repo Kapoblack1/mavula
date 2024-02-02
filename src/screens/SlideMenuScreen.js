@@ -5,7 +5,12 @@ import { Export } from 'iconsax-react-native';
 import { useNavigation } from '@react-navigation/native';
 
 
-export default function SlideMenuScreen({onClosePress, ShowProfile, ShowHome}) {
+export default function SlideMenuScreen({
+  onClosePress,
+  ShowProfile,
+  ShowHome,
+  handleLogout,
+}) {
   const [currentTab, setCurrentTab] = useState("Home");
   const [showMenu, setShowMenu] = useState(false);
   const navigation = useNavigation();
@@ -23,24 +28,36 @@ export default function SlideMenuScreen({onClosePress, ShowProfile, ShowHome}) {
             <Text style={styles.text}>Início</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={ ShowProfile } style={styles.touchableText}>
+          <TouchableOpacity onPress={ShowProfile} style={styles.touchableText}>
             <Text style={styles.text}>Minha conta</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleMenuPress("Armazenamento")} style={styles.touchableText}>
+          <TouchableOpacity
+            onPress={() => handleMenuPress("Armazenamento")}
+            style={styles.touchableText}
+          >
             <Text style={styles.text}>Armazenamento</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleMenuPress("Turmas")} style={styles.touchableText}>
+          <TouchableOpacity
+            onPress={() => handleMenuPress("Turmas")}
+            style={styles.touchableText}
+          >
             <Text style={styles.text}>Turmas</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleMenuPress("Definiçôes")} style={styles.touchableText}>
+          <TouchableOpacity
+            onPress={() => handleMenuPress("Definiçôes")}
+            style={styles.touchableText}
+          >
             <Text style={styles.text}>Definiçôes</Text>
           </TouchableOpacity>
 
           <View style={styles.container2}>
-            <TouchableOpacity onPress={{}} style={styles.touchableText}>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={styles.touchableText}
+            >
               <Export style={styles.logout}></Export>
               <Text style={styles.text1}>Terminar Sessão</Text>
             </TouchableOpacity>

@@ -7,6 +7,8 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
+import { useUserRole } from "../hooks";
+import { FIREBASE_AUTH } from "../../FirebaseConfig";
 
 const ContentFolder = ({
   value,
@@ -25,6 +27,9 @@ const ContentFolder = ({
   navigateToFilesScreen,
 }) => {
   let folder, dot, cor;
+  const userId = FIREBASE_AUTH.currentUser?.uid;
+  const role = useUserRole(userId);
+  const isSutdent = role === "student";
   const [toggleFolderOptions, setToggleFolderOptions] = useState(false);
 
   const toggleOptions = () => {
@@ -62,7 +67,7 @@ const ContentFolder = ({
       <View style={[styles.container, { backgroundColor: color }]}>
         <View style={styles.header}>
           <Image source={folder} style={styles.folderImage} />
-          {!isForCreation && (
+          {!isSutdent && !isForCreation && (
             <Pressable
               style={{
                 right: -15,
@@ -91,7 +96,7 @@ const ContentFolder = ({
           </Text>
         </Pressable>
       </View>
-      {toggleFolderOptions && (
+      {!isSutdent && toggleFolderOptions && (
         <View style={styles.folderOptions}>
           <Pressable onPress={setShowUploadModal}>
             <Text style={styles.folderOptionsText}>Carregar ficheiros</Text>

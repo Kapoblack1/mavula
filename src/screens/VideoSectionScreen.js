@@ -7,38 +7,25 @@ import {
   ScrollView,
   TextInput,
   Pressable,
+  RefreshControl,
 } from "react-native";
-import { format } from 'date-fns';
+
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
-import { FILES } from "../mocks/files";
-import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../FirebaseConfig';
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { FIREBASE_DB } from "../../FirebaseConfig";
+import useGetVideos from "../hooks/useGetVideos";
+import { useRefresh } from "../hooks";
 
 const arrow = require("../../assets/arrowleft.png");
 const menu = require("../../assets/menu1.png");
 
 export default function VideoSectionScreen() {
-  const [videos, setVideos] = useState([]);
+  const { videos, loading: loadingVideos, refetch, error } = useGetVideos(); // Updated to use useGetVideos hook
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-
-  useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(FIREBASE_DB, "videos"));
-        const videosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log("Fetched Videos:", videosData); // Debugging log
-        setVideos(videosData);
-      } catch (error) {
-        console.error("Error fetching videos:", error);
-      }
-    };
-  
-    fetchVideos();
-  }, []);
-
+  const { refreshing, onRefresh } = useRefresh(refetch);
   if (loading) {
     return <Text>Loading videos...</Text>; // Or any other loading indicator
   }
@@ -46,15 +33,21 @@ export default function VideoSectionScreen() {
   const formatVideoSize = (sizeInBytes) => {
     const KB = sizeInBytes / 1024;
     const MB = KB / 1024;
-  
+
     if (MB >= 1) {
       return `${MB.toFixed(2)} MB`;
     } else {
       return `${KB.toFixed(2)} KB`;
     }
   };
+
   return (
-    <ScrollView style={styles.pag}>
+    <ScrollView
+      style={styles.pag}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.container}>
         <Pressable onPress={() => navigation.goBack()}>
           <Image source={arrow} />
@@ -106,7 +99,9 @@ export default function VideoSectionScreen() {
             <View style={styles.videoInfoContainer}>
               <Text style={styles.minhaConta}>{video.name}</Text>
               {/*<Text style={styles.minhaConta}>{video.time}</Text>*/}
-              <Text style={styles.minhaConta}>{formatVideoSize(video.size)}</Text>
+              <Text style={styles.minhaConta}>
+                {formatVideoSize(video.size)}
+              </Text>
             </View>
           </View>
         </Pressable>

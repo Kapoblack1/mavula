@@ -5,61 +5,61 @@ import InfoContainer from "../Components/Login/InfoContainer";
 import InputContainer from "../Components/Login/InputContainer";
 import InputRegister from '../Components/registar/InputRegistar';
 import { useNavigation } from '@react-navigation/native';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import {GoogleAuthProvider, signInWithPopup} from 'firebase/auth'
-const windowWidth1 = Dimensions.get('window').width - 100;
-const windowHeight = Dimensions.get('window').height;
-const windowHeight1 = Dimensions.get('window').height / 2;
-const windowWidth = Dimensions.get('window').width;
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { doc, setDoc } from '@firebase/firestore';
+const windowWidth1 = Dimensions.get("window").width - 100;
 
 export default function LoginScreen() {
   const navigation = useNavigation();
   const [infoContainerVisible, setInfoContainerVisible] = useState(true);
   const [inputContainerVisible, setInputContainerVisible] = useState(false);
   const [inputRegistarVisible, setInputRegistarVisible] = useState(false);
-  const [studentNumber, setStudentNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [welcomeText, setWelcomeText] = useState('Seja bem-vindo a');
-  const windowHeight = Dimensions.get('window').height;
-  const windowWidth = Dimensions.get('window').width;
+  const [studentNumber, setStudentNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [welcomeText, setWelcomeText] = useState("Seja bem-vindo a");
+  const windowHeight = Dimensions.get("window").height;
+  const windowWidth = Dimensions.get("window").width;
 
   const showInputContainer = () => {
     setInfoContainerVisible(false);
     setInputContainerVisible(true);
     setInputRegistarVisible(false);
-    setWelcomeText('Aceda a');
+    setWelcomeText("Aceda a");
   };
 
   const showInputRegistar = () => {
     setInfoContainerVisible(false);
     setInputContainerVisible(false);
     setInputRegistarVisible(true);
-    setWelcomeText('Crie uma conta');
+    setWelcomeText("Crie uma conta");
   };
 
-  function Login(){
-    navigation.navigate('DrawerScreen')
+  function Login() {
+    navigation.navigate("DrawerScreen");
   }
 
   function handleLoginSuccess(userCredential) {
-    console.log('Usuário autenticado com sucesso:', userCredential.user.uid);
-    navigation.navigate('DrawerScreen');
+    console.log("Usuário autenticado com sucesso:", userCredential.user.uid);
+    navigation.navigate("DrawerScreen");
   }
-  
+
   function handleLoginError(error) {
-    console.error('Erro ao autenticar usuário:', error.message);
+    console.error("Erro ao autenticar usuário:", error.message);
   }
-  
+
   function createUserSuccess(userCredential) {
-    console.log('Novo usuário criado com sucesso:', userCredential.user.uid);
-    navigation.navigate('DrawerScreen');
+    console.log("Novo usuário criado com sucesso:", userCredential.user.uid);
+    navigation.navigate("DrawerScreen");
   }
-  
+
   function createUserError(error) {
-    console.error('Erro ao criar usuário:', error.message);
+    console.error("Erro ao criar usuário:", error.message);
   }
-  
+
   function handleLogin() {
     signInWithEmailAndPassword(FIREBASE_AUTH, studentNumber, password)
       .then(handleLoginSuccess)
@@ -67,27 +67,50 @@ export default function LoginScreen() {
         handleLoginError(signInError);
       });
   }
-  
+
+  // function createUser() {
+  //   createUserWithEmailAndPassword(FIREBASE_AUTH, studentNumber, password)
+  //     .then(createUserSuccess)
+  //     .catch(createUserError);
+  // }
+
   function createUser() {
     createUserWithEmailAndPassword(FIREBASE_AUTH, studentNumber, password)
-      .then(createUserSuccess)
+      .then((userCredential) => {
+        const userRef = doc(FIREBASE_DB, "users", userCredential.user.uid);
+        setDoc(userRef, { role: "student" }, { merge: true })
+          .then(() => {
+            console.log("User role set to student");
+            createUserSuccess(userCredential);
+          })
+          .catch(createUserError);
+      })
       .catch(createUserError);
   }
-  
+
   return (
-    <KeyboardAvoidingView style={styles.container}
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView>
-      <Image
+        <Image
           source={require("../../assets/hero_Nero1.png")}
-          style={[styles.backgroundImage, { height: windowHeight / 2.06 }, { width: windowWidth + 65 }]}
+          style={[
+            styles.backgroundImage,
+            { height: windowHeight / 2.06 },
+            { width: windowWidth + 65 },
+          ]}
         ></Image>
         <View style={styles.containerInfo}>
           <Text style={styles.BoasVindas}>{welcomeText}</Text>
           <Text style={styles.mavula}>Mavula</Text>
-          {infoContainerVisible && <InfoContainer isVisible={infoContainerVisible} showInputRegistar={showInputContainer} />}
+          {infoContainerVisible && (
+            <InfoContainer
+              isVisible={infoContainerVisible}
+              showInputRegistar={showInputContainer}
+            />
+          )}
         </View>
 
         {inputContainerVisible && (
@@ -98,7 +121,6 @@ export default function LoginScreen() {
             setPassword={setPassword}
             toggleContainerInfo={showInputRegistar}
             Login={handleLogin}
-            
           />
         )}
 
@@ -109,13 +131,12 @@ export default function LoginScreen() {
             setStudentNumber={setStudentNumber}
             setPassword={setPassword}
             toggleContainerInfo={showInputContainer}
-            Login = {Login}
+            Login={Login}
             createUser={createUser}
           />
         )}
       </ScrollView>
     </KeyboardAvoidingView>
-    
   );
 };
 

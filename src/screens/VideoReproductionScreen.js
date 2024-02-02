@@ -1,21 +1,26 @@
 import {
   Image,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { ArrowDownSVG, ArrowLeftSVG, DotsSVG } from "../Components/svg";
 import { FILES } from "../mocks/files";
 import { Video } from "expo-av";
+import { useGetVideos, useRefresh } from "../hooks";
 
 const VideoReproductionScreen = ({ route }) => {
+  const { videos, loading, refetch, error } = useGetVideos(); // Updated to use useGetVideos hook
   const navigation = useNavigation();
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(true);
-
+  const height = useWindowDimensions().height;
+  const width = useWindowDimensions().width;
   const [toggleDescription, setToggleDescription] = useState(false);
   const {
     views,
@@ -28,6 +33,8 @@ const VideoReproductionScreen = ({ route }) => {
     videoDescription,
   } = route.params;
 
+  const { refreshing, onRefresh } = useRefresh(refetch);
+
   const PlayButton = ({ onPress }) => {
     return (
       <Pressable onPress={onPress} style={styles.playButton}>
@@ -37,7 +44,12 @@ const VideoReproductionScreen = ({ route }) => {
     );
   };
   return (
-    <View style={styles.container}>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      style={[styles.container, { height: height, width: width }]}
+    >
       <View style={styles.header}>
         <Pressable
           onPress={() => {
@@ -99,44 +111,49 @@ const VideoReproductionScreen = ({ route }) => {
         <View style={styles.relatedVideos}>
           <Text style={styles.relatedVideosTitle}>Videos Relacionados</Text>
           <View style={styles.relatedVideosContainer}>
-            {FILES.filter(
-              (file) => file.genre === videoGenre && file.name != videoName
-            ).map((file, index) => (
-              <Pressable
-                key={index}
-                onPress={() =>
-                  navigation.navigate("VideoReproductionScreen", {
-                    views: file.views,
-                    videoName: file.name,
-                    videoSize: file.size,
-                    videoTime: file.time,
-                    videoGenre: file.genre,
-                    videoThumbnail: file.thumbnail,
-                    videoDescription: file.description,
-                  })
-                }
-              >
-                <View style={styles.relatedVideosVideo}>
-                  <View style={styles.relatedVideoThumb}>
-                    <Image
-                      source={{ uri: file.thumbnail }}
-                      resizeMode="cover"
-                      style={{ flex: 1 }}
-                    />
+            {videos
+              .filter(
+                (file) =>
+                  file.genre &&
+                  file.genre === videoGenre &&
+                  file.name != videoName
+              )
+              .map((file, index) => (
+                <Pressable
+                  key={index}
+                  onPress={() =>
+                    navigation.navigate("VideoReproductionScreen", {
+                      views: file.views,
+                      videoName: file.name,
+                      videoSize: file.size,
+                      videoTime: file.time,
+                      videoGenre: file.genre,
+                      videoThumbnail: file.thumbnail,
+                      videoDescription: file.description,
+                    })
+                  }
+                >
+                  <View style={styles.relatedVideosVideo}>
+                    <View style={styles.relatedVideoThumb}>
+                      <Image
+                        source={{ uri: file.thumbnail }}
+                        resizeMode="cover"
+                        style={{ flex: 1 }}
+                      />
+                    </View>
+                    <View style={styles.relatedVideosVideoInfoContainer}>
+                      <Text style={styles.relatedVideosVideoInfoText}>
+                        {file.name}
+                      </Text>
+                      <Text style={styles.normalText}>{file.description}</Text>
+                    </View>
                   </View>
-                  <View style={styles.relatedVideosVideoInfoContainer}>
-                    <Text style={styles.relatedVideosVideoInfoText}>
-                      {file.name}
-                    </Text>
-                    <Text style={styles.normalText}>{file.description}</Text>
-                  </View>
-                </View>
-              </Pressable>
-            ))}
+                </Pressable>
+              ))}
           </View>
         </View>
       </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -146,7 +163,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 60,
-    alignItems: "center",
+    // alignItems: "center",
     backgroundColor: "white",
   },
   header: {
@@ -228,9 +245,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   playButton: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
     left: 0,
     right: 0,
     top: 0,
@@ -238,6 +255,6 @@ const styles = StyleSheet.create({
   },
   playButtonText: {
     fontSize: 60,
-    color: 'white',
+    color: "white",
   },
 });
