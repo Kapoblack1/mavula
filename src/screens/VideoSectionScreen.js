@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -8,14 +8,14 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 import { FILES } from "../mocks/files";
-import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../FirebaseConfig';
-
+import { useEffect, useState } from "react";
+import { FIREBASE_DB } from "../../FirebaseConfig";
+import { collection, getDocs, query, where } from "firebase/firestore";
+// Atualize para o caminho correto
 const arrow = require("../../assets/arrowleft.png");
 const menu = require("../../assets/menu1.png");
 
@@ -28,14 +28,17 @@ export default function VideoSectionScreen() {
     const fetchVideos = async () => {
       try {
         const querySnapshot = await getDocs(collection(FIREBASE_DB, "videos"));
-        const videosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const videosData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         console.log("Fetched Videos:", videosData); // Debugging log
         setVideos(videosData);
       } catch (error) {
         console.error("Error fetching videos:", error);
       }
     };
-  
+
     fetchVideos();
   }, []);
 
@@ -46,7 +49,7 @@ export default function VideoSectionScreen() {
   const formatVideoSize = (sizeInBytes) => {
     const KB = sizeInBytes / 1024;
     const MB = KB / 1024;
-  
+
     if (MB >= 1) {
       return `${MB.toFixed(2)} MB`;
     } else {
@@ -106,7 +109,9 @@ export default function VideoSectionScreen() {
             <View style={styles.videoInfoContainer}>
               <Text style={styles.minhaConta}>{video.name}</Text>
               {/*<Text style={styles.minhaConta}>{video.time}</Text>*/}
-              <Text style={styles.minhaConta}>{formatVideoSize(video.size)}</Text>
+              <Text style={styles.minhaConta}>
+                {formatVideoSize(video.size)}
+              </Text>
             </View>
           </View>
         </Pressable>
