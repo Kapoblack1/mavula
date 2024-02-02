@@ -8,12 +8,12 @@ import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCp1h1JIKNsGg7njSfWRM-cLogXfMV-zBw",
-  authDomain: "rnauthvideo-e66de.firebaseapp.com",
-  projectId: "rnauthvideo-e66de",
-  storageBucket: "rnauthvideo-e66de.appspot.com",
-  messagingSenderId: "943012848249",
-  appId: "1:943012848249:web:35a6d06f21b5d8fca5eaa8",
+  apiKey: "AIzaSyD5FeeuBqCRXBMM8TdbGpJHabnEGvSyA0c",
+  authDomain: "expo-firebase-57bba.firebaseapp.com",
+  projectId: "expo-firebase-57bba",
+  storageBucket: "expo-firebase-57bba.appspot.com",
+  messagingSenderId: "363392890996",
+  appId: "1:363392890996:web:3f64026b0f8c2deed0b921"
 };
 
 // Initialize Firebase

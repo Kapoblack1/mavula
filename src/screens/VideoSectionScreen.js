@@ -8,6 +8,7 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
+import { format } from 'date-fns';
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 import { FILES } from "../mocks/files";
@@ -42,6 +43,16 @@ export default function VideoSectionScreen() {
     return <Text>Loading videos...</Text>; // Or any other loading indicator
   }
 
+  const formatVideoSize = (sizeInBytes) => {
+    const KB = sizeInBytes / 1024;
+    const MB = KB / 1024;
+  
+    if (MB >= 1) {
+      return `${MB.toFixed(2)} MB`;
+    } else {
+      return `${KB.toFixed(2)} KB`;
+    }
+  };
   return (
     <ScrollView style={styles.pag}>
       <View style={styles.container}>
@@ -94,8 +105,8 @@ export default function VideoSectionScreen() {
             />
             <View style={styles.videoInfoContainer}>
               <Text style={styles.minhaConta}>{video.name}</Text>
-              <Text style={styles.minhaConta}>{video.time}</Text>
-              <Text style={styles.minhaConta}>{video.size}</Text>
+              {/*<Text style={styles.minhaConta}>{video.time}</Text>*/}
+              <Text style={styles.minhaConta}>{formatVideoSize(video.size)}</Text>
             </View>
           </View>
         </Pressable>

@@ -11,6 +11,7 @@ import OutsidePressHandler from "react-native-outside-press";
 import { PdfSVG, TimesSVG, UploadSVG } from "../svg";
 import { useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL, storageRef } from "firebase/storage";
 import { FIREBASE_STORAGE } from "../../../FirebaseConfig";
 import { FIREBASE_DB } from "../../../FirebaseConfig";
@@ -32,19 +33,24 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
         console.error("Folder ID is undefined.");
         return;
       }
-
-      const fileRef = ref(
-        FIREBASE_STORAGE,
-        `folders/${folderId}/files/${document.name}`
-      );
-
+  
+      let storagePath;
+      
+      if (isThumbnail) {
+        storagePath = `folders/${folderId}/thumbnails/${document.name}`;
+      } else {
+        storagePath = `folders/${folderId}/files/${document.name}`;
+      }
+  
+      const fileRef = ref(FIREBASE_STORAGE, storagePath);
+  
       const response = await fetch(document.uri);
       const blob = await response.blob();
-
+  
       await uploadBytes(fileRef, blob);
-
+  
       const downloadURL = await getDownloadURL(fileRef);
-
+  
       return downloadURL; // Return the URL for both thumbnail and video
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -99,52 +105,76 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
   };
 
   const handleUpload = async () => {
-    console.log("Selected documents for upload:", selectedDocuments); // Debug log
-
     let videoFileURL = "";
     let thumbnailURL = "";
-
+    let size;
+    let time;
+  
+    // Carregue a miniatura primeiro, se houver
+    if (thumbnail) {
+      const thumbnailFile = { uri: thumbnail, name: "thumbnail.jpg" };
+      thumbnailURL = await uploadFile(thumbnailFile, true);
+    }
+  
+    // Verifique se há documentos selecionados
     if (selectedDocuments && selectedDocuments.length > 0) {
       for (const document of selectedDocuments) {
         if (verifyFileSize(document)) {
-          const isThumbnail = document === thumbnail; // Check if the current document is the thumbnail
-          const uploadedURL = await uploadFile(document, isThumbnail);
-
-          if (isThumbnail) {
-            thumbnailURL = uploadedURL;
-          } else if (isVideo) {
-            videoFileURL = uploadedURL; // Save video file URL if it's a video
+          size = document.size;
+          time = document.modificationTime;
+          // Não verifique se o documento é a miniatura aqui
+          const uploadedURL = await uploadFile(document);
+  
+          if (isVideo) {
+            videoFileURL = uploadedURL; // Salve a URL do arquivo de vídeo
           }
         }
       }
+  
+      if (isVideo) {
+        // Garanta que time é definido
+        time = time || new Date().toISOString(); // Se time for undefined, defina como a hora atual
+  
+        // Atualize os dados do vídeo com as URLs do vídeo e da miniatura
+        const videoData = {
+          name: videoName,
+          genre: videoGenre,
+          description: "Your video description here",
+          url: videoFileURL,
+          size: size,
+          time: time,
+          thumbnail: thumbnailURL, // URL da miniatura atualizada
+        };
+  
+        await saveVideoData(videoData);
+      }
+  
+      refetch();
+      Alert.alert("Upload Successful", "Files have been uploaded successfully.");
     } else {
       Alert.alert("No File Selected", "Please select a file to upload.");
-      return;
     }
-
-    if (isVideo) {
-      // Update video metadata with the video and thumbnail URLs
-      const videoData = {
-        name: videoName,
-        genre: videoGenre,
-        description: "Your video description here", // Replace with actual description
-        url: videoFileURL,
-        thumbnailURL: thumbnailURL,
-      };
-
-      await saveVideoData(videoData);
-    }
-
-    refetch();
-    Alert.alert("Upload Successful", "Files have been uploaded successfully.");
   };
+  
+  
+  
 
   const selectThumbnail = async () => {
-    const result = await DocumentPicker.getDocumentAsync({ type: "image/*" });
-    if (!result.canceled) {
-      setThumbnail(result.uri);
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      });
+
+      if (!result.canceled) {
+        setThumbnail(result.uri);
+      }
+    } catch (error) {
+      console.log('Error selecting thumbnail:', error);
     }
+    
   };
+
+  
   return (
     <View style={[styles.modalContainer, { height: height }]}>
       <View
@@ -164,19 +194,7 @@ const UploadModal = ({ folderId, handleClose, refetch }) => {
             Clique para selecionar ficheiro(s)
           </Text>
         </Pressable>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          {selectedDocuments.length > 1 && (
-            <>
-              <Text>Seleção:</Text>
-              {selectedDocuments.map((item, index) => (
-                <Text key={index}>
-                  {item.name}
-                  {index === -index ? ", " : ""}
-                </Text>
-              ))}
-            </>
-          )}
-        </View>
+
         <Pressable
           onPress={() => {
             handleUpload(selectedDocuments);

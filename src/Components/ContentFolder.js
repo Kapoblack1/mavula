@@ -145,6 +145,7 @@ const styles = StyleSheet.create({
   },
   folderImage: {
     marginRight: 20,
+
   },
   folderOptions: {
     gap: 10,
